@@ -3,7 +3,7 @@ package jamule.ec.tag
 import jamule.ec.*
 import org.slf4j.Logger
 
-@OptIn(ExperimentalStdlibApi::class)
+@OptIn(ExperimentalStdlibApi::class, ExperimentalUnsignedTypes::class)
 class TagParser(
     private val logger: Logger
 ) {
@@ -13,11 +13,11 @@ class TagParser(
      * UTF-8 numbers, otherwise they are parsed as binary numbers.
      * Returns a pair of the parsed tag and the index of the last byte of the tag.
      */
-    fun parse(payload: ByteArray, index: Int, utf: Boolean): Pair<Tag<out Any>, Int> =
+    fun parse(payload: UByteArray, index: Int, utf: Boolean): Pair<Tag<out Any>, Int> =
         parseWithMetadata(payload, index, utf)
             .let { (tag, meta) -> Pair(tag, meta.endIndex) }
 
-    private fun parseWithMetadata(payload: ByteArray, tagNameIndex: Int, utf: Boolean): Pair<Tag<out Any>, TagMeta> {
+    private fun parseWithMetadata(payload: UByteArray, tagNameIndex: Int, utf: Boolean): Pair<Tag<out Any>, TagMeta> {
         // First part is the tag name and the flag indicating if it has subtags
         // As per docs, it's the last bit of the tag name
         val tagNameAndHasSubtags = payload.readUint16(utf, tagNameIndex)

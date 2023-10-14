@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUnsignedTypes::class)
+
 package jamule.ec.tag
 
 import jamule.ec.*
@@ -12,7 +14,7 @@ sealed class Tag<T : Any>(
     private val subTags: List<Tag<*>> = emptyList()
     private lateinit var value: T
 
-    abstract fun parseValue(value: ByteArray)
+    abstract fun parseValue(value: UByteArray)
 
     fun getValue() = value
 
@@ -21,19 +23,19 @@ sealed class Tag<T : Any>(
         this.value = value
     }
 
-    abstract fun encodeValue(): ByteArray
+    abstract fun encodeValue(): UByteArray
 }
 
 data class CustomTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
-    Tag<ByteArray>(name, ECTagType.EC_TAGTYPE_CUSTOM, subtags) {
+    Tag<UByteArray>(name, ECTagType.EC_TAGTYPE_CUSTOM, subtags) {
 
-    constructor(name: ECTagName, value: ByteArray, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
+    constructor(name: ECTagName, value: UByteArray, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
     }
 
-    override fun encodeValue(): ByteArray = getValue()
+    override fun encodeValue(): UByteArray = getValue()
 
-    override fun parseValue(value: ByteArray) {
+    override fun parseValue(value: UByteArray) {
         setValue(value)
     }
 }
@@ -45,11 +47,11 @@ data class UByteTag(override val name: ECTagName, override val subtags: List<Tag
         setValue(value)
     }
 
-    override fun encodeValue(): ByteArray = byteArrayOf(getValue().toByte())
+    override fun encodeValue(): UByteArray = ubyteArrayOf(getValue())
 
-    override fun parseValue(value: ByteArray) {
+    override fun parseValue(value: UByteArray) {
         if (value.isEmpty()) setValue(0u)
-        else if (value.size == 1) setValue(value[0].toUByte())
+        else if (value.size == 1) setValue(value[0])
         else throw IllegalArgumentException("UInt8Tag value must be 1 byte long")
     }
 }
@@ -61,9 +63,9 @@ data class UShortTag(override val name: ECTagName, override val subtags: List<Ta
         setValue(value)
     }
 
-    override fun encodeValue(): ByteArray = getValue().toByteArray()
+    override fun encodeValue(): UByteArray = getValue().toUByteArray()
 
-    override fun parseValue(value: ByteArray) {
+    override fun parseValue(value: UByteArray) {
         if (value.isEmpty()) setValue(0u)
         else if (value.size == 2) setValue(value.readUint16(false, 0).toUShort())
         else throw IllegalArgumentException("UInt16Tag value must be 2 bytes long")
@@ -77,9 +79,9 @@ data class UIntTag(override val name: ECTagName, override val subtags: List<Tag<
         setValue(value)
     }
 
-    override fun encodeValue(): ByteArray = getValue().toByteArray()
+    override fun encodeValue(): UByteArray = getValue().toUByteArray()
 
-    override fun parseValue(value: ByteArray) {
+    override fun parseValue(value: UByteArray) {
         if (value.isEmpty()) setValue(0u)
         else if (value.size == 4) setValue(value.readUInt32(false, 0))
         else throw IllegalArgumentException("UInt32Tag value must be 4 bytes long")
@@ -93,9 +95,9 @@ data class ULongTag(override val name: ECTagName, override val subtags: List<Tag
         setValue(value)
     }
 
-    override fun encodeValue(): ByteArray = getValue().toByteArray()
+    override fun encodeValue(): UByteArray = getValue().toUByteArray()
 
-    override fun parseValue(value: ByteArray) {
+    override fun parseValue(value: UByteArray) {
         if (value.isEmpty()) setValue(0u)
         else if (value.size == 8) setValue(value.toUInt64())
         else throw IllegalArgumentException("UInt64Tag value must be 8 bytes long")
@@ -109,11 +111,11 @@ data class UInt128Tag(override val name: ECTagName, override val subtags: List<T
         setValue(value)
     }
 
-    override fun encodeValue(): ByteArray = getValue().toByteArray()
+    override fun encodeValue(): UByteArray = getValue().toByteArray().toUByteArray()
 
-    override fun parseValue(value: ByteArray) {
+    override fun parseValue(value: UByteArray) {
         if (value.isEmpty()) setValue(BigInteger.ZERO)
-        else setValue(BigInteger(value))
+        else setValue(BigInteger(value.toByteArray()))
     }
 }
 
@@ -124,11 +126,11 @@ data class StringTag(override val name: ECTagName, override val subtags: List<Ta
         setValue(value)
     }
 
-    override fun encodeValue(): ByteArray = getValue().toByteArray() + 0x00.toByte()
+    override fun encodeValue(): UByteArray = getValue().toByteArray().toUByteArray() + 0x00.toUByte()
 
-    override fun parseValue(value: ByteArray) {
-        if (value[value.size - 1] != 0x00.toByte()) throw IllegalArgumentException("StringTag value must be null terminated")
-        else setValue(value.decodeToString().trimEnd(0.toChar()))
+    override fun parseValue(value: UByteArray) {
+        if (value[value.size - 1] != 0x00.toUByte()) throw IllegalArgumentException("StringTag value must be null terminated")
+        else setValue(value.toByteArray().decodeToString().trimEnd(0.toChar()))
     }
 }
 
@@ -139,11 +141,11 @@ data class DoubleTag(override val name: ECTagName, override val subtags: List<Ta
         setValue(value)
     }
 
-    override fun encodeValue(): ByteArray = getValue().toString().toByteArray() + 0x00.toByte()
+    override fun encodeValue(): UByteArray = getValue().toString().toByteArray().toUByteArray() + 0x00.toUByte()
 
-    override fun parseValue(value: ByteArray) {
-        if (value[value.size - 1] != 0x00.toByte()) throw IllegalArgumentException("DoubleTag value must be null terminated")
-        else setValue(value.decodeToString().trimEnd(0.toChar()).toDouble())
+    override fun parseValue(value: UByteArray) {
+        if (value[value.size - 1] != 0x00.toUByte()) throw IllegalArgumentException("DoubleTag value must be null terminated")
+        else setValue(value.toByteArray().decodeToString().trimEnd(0.toChar()).toDouble())
     }
 }
 
@@ -155,15 +157,15 @@ data class Ipv4Tag(override val name: ECTagName, override val subtags: List<Tag<
     }
 
     @OptIn(ExperimentalUnsignedTypes::class)
-    override fun encodeValue(): ByteArray =
-        getValue().address.split(".").map { it.toUByte() }.toUByteArray().toByteArray() + getValue().port.toByteArray()
+    override fun encodeValue(): UByteArray =
+        getValue().address.split(".").map { it.toUByte() }.toUByteArray() + getValue().port.toUByteArray()
 
-    override fun parseValue(value: ByteArray) {
+    override fun parseValue(value: UByteArray) {
         // IPV4 is 4 bytes long, the last 2 bytes are used for the port
         if (value.size != 6) throw IllegalArgumentException("Ipv4Tag value must be 6 bytes long")
         else setValue(
             Ipv4(
-                "${value[0].toUByte()}.${value[1].toUByte()}.${value[2].toUByte()}.${value[3].toUByte()}",
+                "${value[0]}.${value[1]}.${value[2]}.${value[3]}",
                 value.readUint16(false, 4)
             )
         )
@@ -173,15 +175,15 @@ data class Ipv4Tag(override val name: ECTagName, override val subtags: List<Tag<
 }
 
 data class Hash16Tag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
-    Tag<ByteArray>(name, ECTagType.EC_TAGTYPE_HASH16, subtags) {
+    Tag<UByteArray>(name, ECTagType.EC_TAGTYPE_HASH16, subtags) {
 
-    constructor(name: ECTagName, value: ByteArray, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
+    constructor(name: ECTagName, value: UByteArray, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
     }
 
-    override fun encodeValue(): ByteArray = getValue()
+    override fun encodeValue(): UByteArray = getValue()
 
-    override fun parseValue(value: ByteArray) {
+    override fun parseValue(value: UByteArray) {
         if (value.size == 16) setValue(value)
         else throw IllegalArgumentException("Hash16Tag value must be 16 bytes long")
     }

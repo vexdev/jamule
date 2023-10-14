@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUnsignedTypes::class)
+
 package jamule.ec.packet
 
 import jamule.ec.*
@@ -38,7 +40,7 @@ class PacketParser(
             decompressPayload(stream, length)
         } else {
             logger.debug("Packet is not compressed")
-            stream.readNBytes(length.toInt())
+            stream.readNBytes(length.toInt()).toUByteArray()
         }
         logger.trace("Payload: {}", payload)
         return Transport(flags, acceptsFlags, length, payload)
@@ -82,7 +84,7 @@ class PacketParser(
         return Packet(opCode, tagList, transport.flags, transport.acceptsFlags)
     }
 
-    private fun decompressPayload(stream: InputStream, length: UInt): ByteArray {
+    private fun decompressPayload(stream: InputStream, length: UInt): UByteArray {
         val compressed = stream.readNBytes(length.toInt())
         val inflater = Inflater()
         inflater.setInput(compressed)
@@ -94,17 +96,17 @@ class PacketParser(
         }
         outputStream.close()
         inflater.end()
-        return outputStream.toByteArray()
+        return outputStream.toByteArray().toUByteArray()
     }
 
     private fun InputStream.readUInt(): UInt =
-        this.readNBytes(4).readUInt32(false, 0)
+        this.readNBytes(4).toUByteArray().readUInt32(false, 0)
 
     private data class Transport(
         val flags: Flags,
         val acceptsFlags: Flags?,
         val length: UInt,
-        val payload: ByteArray
+        val payload: UByteArray
     )
 
     companion object {

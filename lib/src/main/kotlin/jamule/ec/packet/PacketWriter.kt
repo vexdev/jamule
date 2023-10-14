@@ -2,11 +2,12 @@ package jamule.ec.packet
 
 import jamule.ec.InvalidECException
 import jamule.ec.tag.TagEncoder
-import jamule.ec.toByteArray
+import jamule.ec.toUByteArray
 import org.slf4j.Logger
 import java.io.OutputStream
 import java.util.zip.Deflater
 
+@OptIn(ExperimentalUnsignedTypes::class)
 class PacketWriter(
     private val logger: Logger,
     private val tagEncoder: TagEncoder,
@@ -28,13 +29,13 @@ class PacketWriter(
         outputStream: OutputStream
     ) {
         // Print flags first
-        outputStream.write(packet.flags.toUInt().toByteArray())
+        outputStream.write(packet.flags.toUInt().toUByteArray().toByteArray())
 
         // Print accept flags if present
         if (packet.flags.accepts) {
             if (packet.accepts == null)
                 throw InvalidECException("Accepts flags must be provided when packet has accepts flag")
-            outputStream.write(packet.accepts.toUInt().toByteArray())
+            outputStream.write(packet.accepts.toUInt().toUByteArray().toByteArray())
         }
 
         // Encode whole payload
@@ -46,30 +47,30 @@ class PacketWriter(
         }
 
         // Print length
-        outputStream.write(payload.size.toUInt().toByteArray())
+        outputStream.write(payload.size.toUInt().toUByteArray().toByteArray())
 
         // Print payload
-        outputStream.write(payload)
+        outputStream.write(payload.toByteArray())
     }
 
-    private fun encodePayload(packet: Packet): ByteArray {
-        val opCode = packet.opCode.value.toByte()
-        val tagCount = packet.tags.size.toUShort().toByteArray(packet.flags.utf8)
+    private fun encodePayload(packet: Packet): UByteArray {
+        val opCode = packet.opCode.value
+        val tagCount = packet.tags.size.toUShort().toUByteArray(packet.flags.utf8)
         val tags = List(packet.tags.size) { i ->
             tagEncoder.encode(packet.tags[i], packet.flags.utf8)
         }.reduce { acc, bytes -> acc + bytes }
-        return ByteArray(0) + opCode + tagCount + tags
+        return UByteArray(0) + opCode + tagCount + tags
     }
 
-    private fun compressPayload(input: ByteArray): ByteArray {
+    private fun compressPayload(input: UByteArray): UByteArray {
         val deflater = Deflater()
-        deflater.setInput(input)
+        deflater.setInput(input.toByteArray())
         deflater.finish()
 
         val compressedData = ByteArray(input.size)
         val compressedDataLength = deflater.deflate(compressedData)
 
-        return compressedData.copyOfRange(0, compressedDataLength)
+        return compressedData.copyOfRange(0, compressedDataLength).toUByteArray()
     }
 
 }

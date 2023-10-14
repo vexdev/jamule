@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalUnsignedTypes::class)
+
 package jamule.ec
 
 import org.junit.jupiter.api.Test
@@ -7,7 +9,7 @@ class EncodingTest {
 
     @Test
     fun `decodes utf8 value`() {
-        val encoded = byteArrayOf(0x01)
+        val encoded = ubyteArrayOf(0x01u)
 
         val result = encoded.readUtf8Number(0)
 
@@ -16,7 +18,7 @@ class EncodingTest {
 
     @Test
     fun `decodes and re-encodes same value`() {
-        val encoded = 1u.toUShort().toByteArray(true)
+        val encoded = 1u.toUShort().toUByteArray(true)
 
         val result = encoded.readUtf8Number(0)
 

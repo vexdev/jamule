@@ -1,21 +1,22 @@
 package jamule.ec.tag
 
-import jamule.ec.toByteArray
+import jamule.ec.toUByteArray
 import org.slf4j.Logger
 
+@OptIn(ExperimentalUnsignedTypes::class)
 class TagEncoder(
     private val logger: Logger
 ) {
 
-    fun encode(tag: Tag<out Any>, utf8: Boolean): ByteArray {
+    fun encode(tag: Tag<out Any>, utf8: Boolean): UByteArray {
         val tagNameAndSubtags: UShort =
             ((tag.name.value.toUInt() shl 1) or if (tag.subtags.isEmpty()) 0u else 1u).toUShort()
-        val tagNameAndSubtagsBytes = tagNameAndSubtags.toByteArray(utf8)
-        val tagLengthBytes = computeTagLength(tag).toByteArray(utf8)
+        val tagNameAndSubtagsBytes = tagNameAndSubtags.toUByteArray(utf8)
+        val tagLengthBytes = computeTagLength(tag).toUByteArray(utf8)
         val subtagPayload = computeSubTagPayload(tag, utf8)
 
         return tagNameAndSubtagsBytes +
-                tag.type.value.toByte() +
+                tag.type.value +
                 tagLengthBytes +
                 subtagPayload +
                 tag.encodeValue()
@@ -36,12 +37,12 @@ class TagEncoder(
         return currentTagLength + subtagsLength
     }
 
-    private fun computeSubTagPayload(tag: Tag<out Any>, utf8: Boolean): ByteArray {
-        val subtagsPayload = mutableListOf<Byte>()
+    private fun computeSubTagPayload(tag: Tag<out Any>, utf8: Boolean): UByteArray {
+        val subtagsPayload = mutableListOf<UByte>()
         for (subtag in tag.subtags) {
             encode(subtag, utf8).forEach { subtagsPayload.add(it) }
         }
-        return subtagsPayload.toByteArray()
+        return subtagsPayload.toUByteArray()
     }
 
 }
