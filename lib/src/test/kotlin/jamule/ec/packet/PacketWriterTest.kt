@@ -1,12 +1,10 @@
-package jamule.ec
+package jamule.ec.packet
 
-import jamule.ec.packet.PacketWriter
 import jamule.ec.tag.TagEncoder
 import org.junit.jupiter.api.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 class PacketWriterTest {
