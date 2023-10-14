@@ -151,23 +151,3 @@ fun Long.toUtf8ByteArray(): ByteArray {
 
     return result
 }
-
-private data class Utf8Table(val cmask: UByte, val cval: UByte, val shift: Int, val lmask: Int, val lval: Int)
-
-private val utf8Table: Array<Utf8Table> = arrayOf(
-    Utf8Table(0x80u, 0x00u, 0 * 6, 0x7F, 0),         // 1 byte sequence
-    Utf8Table(0xE0u, 0xC0u, 1 * 6, 0x7FF, 0x80),    // 2 byte sequence
-    Utf8Table(0xF0u, 0xE0u, 2 * 6, 0xFFFF, 0x800),  // 3 byte sequence
-    Utf8Table(0xF8u, 0xF0u, 3 * 6, 0x1FFFFF, 0x10000), // 4 byte sequence
-    Utf8Table(0xFCu, 0xF8u, 4 * 6, 0x3FFFFFF, 0x200000), // 5 byte sequence
-    Utf8Table(0xFEu, 0xFCu, 5 * 6, 0x7FFFFFFF, 0x4000000), // 6 byte sequence
-)
-
-fun utf8MbRemain(c: UByte): Int {
-    for (i in utf8Table.indices) {
-        if ((c and utf8Table[i].cmask) == utf8Table[i].cval) {
-            return i
-        }
-    }
-    return 5
-}
