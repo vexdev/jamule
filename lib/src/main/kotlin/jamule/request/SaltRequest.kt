@@ -1,5 +1,6 @@
 package jamule.request
 
+import jamule.AmuleClient
 import jamule.Build
 import jamule.ec.ECOpCode
 import jamule.ec.ECTagName

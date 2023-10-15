@@ -1,4 +1,5 @@
-import jamule.AmuleConnection
+package jamule
+
 import jamule.auth.PasswordHasher
 import jamule.exception.AuthFailedException
 import jamule.exception.CommunicationException
