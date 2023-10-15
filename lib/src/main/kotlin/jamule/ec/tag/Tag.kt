@@ -7,6 +7,7 @@ sealed class Tag<T : Any>(
     open val name: ECTagName,
     val type: ECTagType,
     open val subtags: List<Tag<*>>,
+    open val nameValue: UShort,
 ) {
     private val nestingLevel: Int = 0
     private val subTags: List<Tag<*>> = emptyList()
@@ -27,8 +28,12 @@ sealed class Tag<T : Any>(
 }
 
 @ExperimentalUnsignedTypes
-data class CustomTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
-    Tag<UByteArray>(name, ECTagType.EC_TAGTYPE_CUSTOM, subtags) {
+data class CustomTag(
+    override val name: ECTagName,
+    override val subtags: List<Tag<out Any>> = listOf(),
+    override val nameValue: UShort = name.value
+) :
+    Tag<UByteArray>(name, ECTagType.EC_TAGTYPE_CUSTOM, subtags, nameValue) {
 
     constructor(name: ECTagName, value: UByteArray, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -43,8 +48,12 @@ data class CustomTag(override val name: ECTagName, override val subtags: List<Ta
     }
 }
 
-data class UByteTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
-    Tag<UByte>(name, ECTagType.EC_TAGTYPE_UINT8, subtags) {
+data class UByteTag(
+    override val name: ECTagName,
+    override val subtags: List<Tag<out Any>> = listOf(),
+    override val nameValue: UShort = name.value
+) :
+    Tag<UByte>(name, ECTagType.EC_TAGTYPE_UINT8, subtags, nameValue) {
 
     constructor(name: ECTagName, value: UByte, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -63,8 +72,12 @@ data class UByteTag(override val name: ECTagName, override val subtags: List<Tag
     }
 }
 
-data class UShortTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
-    Tag<UShort>(name, ECTagType.EC_TAGTYPE_UINT16, subtags) {
+data class UShortTag(
+    override val name: ECTagName,
+    override val subtags: List<Tag<out Any>> = listOf(),
+    override val nameValue: UShort = name.value
+) :
+    Tag<UShort>(name, ECTagType.EC_TAGTYPE_UINT16, subtags, nameValue) {
 
     constructor(name: ECTagName, value: UShort, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -83,8 +96,12 @@ data class UShortTag(override val name: ECTagName, override val subtags: List<Ta
     }
 }
 
-data class UIntTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
-    Tag<UInt>(name, ECTagType.EC_TAGTYPE_UINT32, subtags) {
+data class UIntTag(
+    override val name: ECTagName,
+    override val subtags: List<Tag<out Any>> = listOf(),
+    override val nameValue: UShort = name.value
+) :
+    Tag<UInt>(name, ECTagType.EC_TAGTYPE_UINT32, subtags, nameValue) {
 
     constructor(name: ECTagName, value: UInt, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -103,8 +120,12 @@ data class UIntTag(override val name: ECTagName, override val subtags: List<Tag<
     }
 }
 
-data class ULongTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
-    Tag<ULong>(name, ECTagType.EC_TAGTYPE_UINT64, subtags) {
+data class ULongTag(
+    override val name: ECTagName,
+    override val subtags: List<Tag<out Any>> = listOf(),
+    override val nameValue: UShort = name.value
+) :
+    Tag<ULong>(name, ECTagType.EC_TAGTYPE_UINT64, subtags, nameValue) {
 
     constructor(name: ECTagName, value: ULong, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -121,8 +142,12 @@ data class ULongTag(override val name: ECTagName, override val subtags: List<Tag
     }
 }
 
-data class UInt128Tag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
-    Tag<BigInteger>(name, ECTagType.EC_TAGTYPE_UINT128, subtags) {
+data class UInt128Tag(
+    override val name: ECTagName,
+    override val subtags: List<Tag<out Any>> = listOf(),
+    override val nameValue: UShort = name.value
+) :
+    Tag<BigInteger>(name, ECTagType.EC_TAGTYPE_UINT128, subtags, nameValue) {
 
     constructor(name: ECTagName, value: BigInteger, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -138,8 +163,12 @@ data class UInt128Tag(override val name: ECTagName, override val subtags: List<T
     }
 }
 
-data class StringTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
-    Tag<String>(name, ECTagType.EC_TAGTYPE_STRING, subtags) {
+data class StringTag(
+    override val name: ECTagName,
+    override val subtags: List<Tag<out Any>> = listOf(),
+    override val nameValue: UShort = name.value
+) :
+    Tag<String>(name, ECTagType.EC_TAGTYPE_STRING, subtags, nameValue) {
 
     constructor(name: ECTagName, value: String, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -155,8 +184,12 @@ data class StringTag(override val name: ECTagName, override val subtags: List<Ta
     }
 }
 
-data class DoubleTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
-    Tag<Double>(name, ECTagType.EC_TAGTYPE_DOUBLE, subtags) {
+data class DoubleTag(
+    override val name: ECTagName,
+    override val subtags: List<Tag<out Any>> = listOf(),
+    override val nameValue: UShort = name.value
+) :
+    Tag<Double>(name, ECTagType.EC_TAGTYPE_DOUBLE, subtags, nameValue) {
 
     constructor(name: ECTagName, value: Double, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -172,8 +205,12 @@ data class DoubleTag(override val name: ECTagName, override val subtags: List<Ta
     }
 }
 
-data class Ipv4Tag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
-    Tag<Ipv4Tag.Ipv4>(name, ECTagType.EC_TAGTYPE_IPV4, subtags) {
+data class Ipv4Tag(
+    override val name: ECTagName,
+    override val subtags: List<Tag<out Any>> = listOf(),
+    override val nameValue: UShort = name.value
+) :
+    Tag<Ipv4Tag.Ipv4>(name, ECTagType.EC_TAGTYPE_IPV4, subtags, nameValue) {
 
     constructor(name: ECTagName, value: Ipv4, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -199,8 +236,12 @@ data class Ipv4Tag(override val name: ECTagName, override val subtags: List<Tag<
 }
 
 @ExperimentalUnsignedTypes
-data class Hash16Tag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
-    Tag<UByteArray>(name, ECTagType.EC_TAGTYPE_HASH16, subtags) {
+data class Hash16Tag(
+    override val name: ECTagName,
+    override val subtags: List<Tag<out Any>> = listOf(),
+    override val nameValue: UShort = name.value
+) :
+    Tag<UByteArray>(name, ECTagType.EC_TAGTYPE_HASH16, subtags, nameValue) {
 
     constructor(name: ECTagName, value: UByteArray, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)

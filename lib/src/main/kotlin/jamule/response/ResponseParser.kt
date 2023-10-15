@@ -1,8 +1,6 @@
 package jamule.response
 
 import jamule.ec.ECOpCode
-import jamule.ec.ECTagName
-import jamule.ec.ECTagName.*
 import jamule.ec.packet.Packet
 import org.slf4j.Logger
 
@@ -16,16 +14,16 @@ class ResponseParser(
         return when (packet.opCode) {
             ECOpCode.EC_OP_NOOP -> TODO()
             ECOpCode.EC_OP_AUTH_REQ -> TODO()
-            ECOpCode.EC_OP_AUTH_FAIL -> TODO()
-            ECOpCode.EC_OP_AUTH_OK -> AuthOkResponse(packet.string(EC_TAG_SERVER_VERSION).getValue())
-            ECOpCode.EC_OP_FAILED -> AuthFailedResponse("aaa")
+            ECOpCode.EC_OP_AUTH_FAIL -> AuthFailedResponse.fromPacket(packet)
+            ECOpCode.EC_OP_AUTH_OK -> AuthOkResponse.fromPacket(packet)
+            ECOpCode.EC_OP_FAILED -> TODO()
             ECOpCode.EC_OP_STRINGS -> TODO()
             ECOpCode.EC_OP_MISC_DATA -> TODO()
             ECOpCode.EC_OP_SHUTDOWN -> TODO()
             ECOpCode.EC_OP_ADD_LINK -> TODO()
             ECOpCode.EC_OP_STAT_REQ -> TODO()
             ECOpCode.EC_OP_GET_CONNSTATE -> TODO()
-            ECOpCode.EC_OP_STATS -> TODO()
+            ECOpCode.EC_OP_STATS -> StatsResponse.fromPacket(packet)
             ECOpCode.EC_OP_GET_DLOAD_QUEUE -> TODO()
             ECOpCode.EC_OP_GET_ULOAD_QUEUE -> TODO()
             ECOpCode.EC_OP_GET_SHARED_FILES -> TODO()
@@ -84,7 +82,7 @@ class ResponseParser(
             ECOpCode.EC_OP_DISCONNECT -> TODO()
             ECOpCode.EC_OP_KAD_UPDATE_FROM_URL -> TODO()
             ECOpCode.EC_OP_KAD_BOOTSTRAP_FROM_IP -> TODO()
-            ECOpCode.EC_OP_AUTH_SALT -> AuthSaltResponse(packet.long(EC_TAG_PASSWD_SALT).getValue())
+            ECOpCode.EC_OP_AUTH_SALT -> AuthSaltResponse.fromPacket(packet)
             ECOpCode.EC_OP_AUTH_PASSWD -> TODO()
             ECOpCode.EC_OP_IPFILTER_UPDATE -> TODO()
             ECOpCode.EC_OP_GET_UPDATE -> TODO()

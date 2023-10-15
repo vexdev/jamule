@@ -23,7 +23,8 @@ class TagParser(
         // First part is the tag name and the flag indicating if it has subtags
         // As per docs, it's the last bit of the tag name
         val tagNameAndHasSubtags = payload.readUint16(utf, tagNameIndex)
-        val tagName = ECTagName.fromValue((payload.readUint16(utf, tagNameIndex) shr 1).toUShort())
+        val tagNameRaw = (payload.readUint16(utf, tagNameIndex) shr 1).toUShort()
+        val tagName = ECTagName.fromValue(tagNameRaw)
         val hasSubtags = tagNameAndHasSubtags and 0x01u == 0x01u
         logger.trace("Tag name: {}, Has subtags: {}", tagName, hasSubtags)
 
@@ -84,16 +85,16 @@ class TagParser(
 
         // We now map the tag type to the correct tag class, parsing the value in the process
         return Pair(when (tagType) {
-            ECTagType.EC_TAGTYPE_CUSTOM -> CustomTag(tagName, subTags)
-            ECTagType.EC_TAGTYPE_UINT8 -> UByteTag(tagName, subTags)
-            ECTagType.EC_TAGTYPE_UINT16 -> UShortTag(tagName, subTags)
-            ECTagType.EC_TAGTYPE_UINT32 -> UIntTag(tagName, subTags)
-            ECTagType.EC_TAGTYPE_UINT64 -> ULongTag(tagName, subTags)
-            ECTagType.EC_TAGTYPE_UINT128 -> UInt128Tag(tagName, subTags)
-            ECTagType.EC_TAGTYPE_DOUBLE -> DoubleTag(tagName, subTags)
-            ECTagType.EC_TAGTYPE_IPV4 -> Ipv4Tag(tagName, subTags)
-            ECTagType.EC_TAGTYPE_HASH16 -> Hash16Tag(tagName, subTags)
-            ECTagType.EC_TAGTYPE_STRING -> StringTag(tagName, subTags)
+            ECTagType.EC_TAGTYPE_CUSTOM -> CustomTag(tagName, subTags, tagNameRaw)
+            ECTagType.EC_TAGTYPE_UINT8 -> UByteTag(tagName, subTags, tagNameRaw)
+            ECTagType.EC_TAGTYPE_UINT16 -> UShortTag(tagName, subTags, tagNameRaw)
+            ECTagType.EC_TAGTYPE_UINT32 -> UIntTag(tagName, subTags, tagNameRaw)
+            ECTagType.EC_TAGTYPE_UINT64 -> ULongTag(tagName, subTags, tagNameRaw)
+            ECTagType.EC_TAGTYPE_UINT128 -> UInt128Tag(tagName, subTags, tagNameRaw)
+            ECTagType.EC_TAGTYPE_DOUBLE -> DoubleTag(tagName, subTags, tagNameRaw)
+            ECTagType.EC_TAGTYPE_IPV4 -> Ipv4Tag(tagName, subTags, tagNameRaw)
+            ECTagType.EC_TAGTYPE_HASH16 -> Hash16Tag(tagName, subTags, tagNameRaw)
+            ECTagType.EC_TAGTYPE_STRING -> StringTag(tagName, subTags, tagNameRaw)
             else -> throw InvalidECException("Unknown tag type: $tagType")
         }.apply { parseValue(tagValue) }.also {
             logger.debug("Parsed tag: {}={} [{}]", it.name, it.getValue(), tagValue.toHexString())
