@@ -476,7 +476,7 @@ enum class ECTagType(val value: UByte) {
 
     companion object {
         fun fromValue(value: UByte): ECTagType {
-            return entries.first { it.value == value }
+            return entries.firstOrNull { it.value == value } ?: EC_TAGTYPE_UNKNOWN
         }
     }
 }

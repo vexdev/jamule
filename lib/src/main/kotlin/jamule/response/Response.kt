@@ -23,6 +23,18 @@ data class AuthFailedResponse(val reason: String) : Response {
     }
 }
 
+data class StringsResponse(val string: String) : Response {
+    companion object {
+        fun fromPacket(packet: Packet) = StringsResponse(packet.string(ECTagName.EC_TAG_STRING)!!.getValue())
+    }
+}
+
+data class ErrorResponse(val message: String) : Response {
+    companion object {
+        fun fromPacket(packet: Packet) = ErrorResponse(packet.string(ECTagName.EC_TAG_STRING)!!.getValue())
+    }
+}
+
 data class StatsResponse(
     val uploadSpeed: Long,
     val downloadSpeed: Long,

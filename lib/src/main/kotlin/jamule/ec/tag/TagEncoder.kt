@@ -13,11 +13,16 @@ class TagEncoder(
             ((tag.name.value.toUInt() shl 1) or if (tag.subtags.isEmpty()) 0u else 1u).toUShort()
         val tagNameAndSubtagsBytes = tagNameAndSubtags.toUByteArray(utf8)
         val tagLengthBytes = computeTagLength(tag).toUByteArray(utf8)
+        val subtagLengthPayload = if (tag.subtags.isNotEmpty())
+            (tag.subtags.size.toUShort()).toUByteArray(utf8)
+        else
+            ubyteArrayOf()
         val subtagPayload = computeSubTagPayload(tag, utf8)
 
         return tagNameAndSubtagsBytes +
                 tag.type.value +
                 tagLengthBytes +
+                subtagLengthPayload +
                 subtagPayload +
                 tag.encodeValue()
     }

@@ -4,6 +4,7 @@ package jamule.ec.packet
 
 import jamule.ec.ECDetailLevel
 import jamule.ec.ECOpCode
+import jamule.ec.ECSearchType
 import jamule.ec.ECTagName
 import jamule.ec.tag.*
 
@@ -63,6 +64,31 @@ class SamplePackets {
                 ECOpCode.EC_OP_AUTH_FAIL,
                 listOf(
                     StringTag(ECTagName.EC_TAG_STRING, "Authentication failed: wrong password."),
+                )
+            ),
+            // Simple search request
+            ("00000020000000192600010e03020000000d00010e040600000005746573740001").hexToByteArray()
+                    to Packet(
+                ECOpCode.EC_OP_SEARCH_START,
+                listOf(
+                    UByteTag(
+                        ECTagName.EC_TAG_SEARCH_TYPE, ECSearchType.EC_SEARCH_GLOBAL.value,
+                        listOf(
+                            StringTag(ECTagName.EC_TAG_SEARCH_NAME, "test")
+                        )
+                    ),
+                ),
+                Flags(utf8 = false)
+            ),
+            // Failed response
+            ("000000220000003805010006336544326b2073" +
+                    "65617263682063616e2774206265206" +
+                    "46f6e65206966206544326b20697320" +
+                    "6e6f7420636f6e6e656374656400").hexToByteArray()
+                    to Packet(
+                ECOpCode.EC_OP_FAILED,
+                listOf(
+                    StringTag(ECTagName.EC_TAG_STRING, "eD2k search can't be done if eD2k is not connected"),
                 )
             )
 

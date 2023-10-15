@@ -60,7 +60,7 @@ class TagParser(
             logger.trace("Tag has {} subtags", subTagCount)
 
             // We reuse the valueStartIndex variable to store the index of the first subtag
-            valueStartIndex += payload[valueStartIndex].numberLength(utf, TAG_LENGTH_SIZE)
+            valueStartIndex += payload[valueStartIndex].numberLength(utf, SUBTAG_COUNT_SIZE)
             for (i in 0..<subTagCount) {
                 logger.trace("Parsing subtag {} starting at {}", i, valueStartIndex)
                 val (subTag: Tag<out Any>, tagMeta) = parseWithMetadata(payload, valueStartIndex, utf)

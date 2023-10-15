@@ -31,7 +31,7 @@ class AmuleConnection(
     @OptIn(ExperimentalUnsignedTypes::class)
     fun sendRequest(request: Request): Response {
         val outputStream = socket.getOutputStream()
-        val inputStream = socket.getInputStream()
+        val inputStream = socket.getInputStream().buffered()
         val packet = request.packet()
         packetWriter.write(packet, outputStream)
         val responsePacket = packetParser.parse(inputStream)
