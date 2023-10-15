@@ -1,13 +1,13 @@
 package jamule.ec
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 fun UShort.toUByteArray(): UByteArray =
     ubyteArrayOf(
         (this.toUInt() shr 8).toUByte(),
         this.toUByte()
     )
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 fun UInt.toUByteArray(): UByteArray =
     ubyteArrayOf(
         (this shr 24).toUByte(),
@@ -16,7 +16,7 @@ fun UInt.toUByteArray(): UByteArray =
         this.toUByte()
     )
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 fun ULong.toUByteArray(): UByteArray =
     ubyteArrayOf(
         (this shr 56).toUByte(),
@@ -29,7 +29,7 @@ fun ULong.toUByteArray(): UByteArray =
         this.toUByte()
     )
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 fun UByteArray.toUInt64(): ULong =
     (((this[0].toLong() and 0xFF) shl 56) or
             ((this[1].toLong() and 0xFF) shl 48) or
@@ -40,28 +40,28 @@ fun UByteArray.toUInt64(): ULong =
             ((this[6].toLong() and 0xFF) shl 8) or
             (this[7].toLong() and 0xFF)).toULong()
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 fun UByteArray.readUInt32(utf: Boolean, index: Int): UInt = if (!utf) {
     this.sliceArray(index..<index + LEN_UINT).toUInt32()
 } else {
     this.readUtf8Number(index).toUInt()
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 private fun UByteArray.toUInt32(): UInt =
     (((this[0].toInt() and 0xFF) shl 24) or
             ((this[1].toInt() and 0xFF) shl 16) or
             ((this[2].toInt() and 0xFF) shl 8) or
             (this[3].toInt() and 0xFF)).toUInt()
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 fun UByteArray.readUint16(utf: Boolean, index: Int): UInt = if (!utf) {
     this.sliceArray(index..<index + LEN_USHORT).toUInt16()
 } else {
     this.readUtf8Number(index).toUInt()
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 private fun UByteArray.toUInt16(): UInt =
     (((this[0].toInt() and 0xFF) shl 8) or
             (this[1].toInt() and 0xFF)).toUInt()
@@ -91,13 +91,13 @@ fun UByte.utf8SequenceLength(): Int {
     return length
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 fun UByteArray.readUtf8Number(offset: Int): Long {
     val str = String(this.toByteArray(), offset, this.toByteArray().size - offset, Charsets.UTF_8)
     return str.codePointAt(0).toLong()
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 fun UShort.toUByteArray(utf: Boolean): UByteArray =
     if (!utf) {
         this.toUByteArray()
@@ -105,7 +105,7 @@ fun UShort.toUByteArray(utf: Boolean): UByteArray =
         this.toULong().toUtf8ByteArray()
     }
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 fun UInt.toUByteArray(utf: Boolean): UByteArray =
     if (!utf) {
         this.toUByteArray()
@@ -113,7 +113,7 @@ fun UInt.toUByteArray(utf: Boolean): UByteArray =
         this.toULong().toUtf8ByteArray()
     }
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 fun ULong.toUtf8ByteArray(): UByteArray {
     val str = String(intArrayOf(this.toInt()), 0, 1)
     return str.toByteArray(Charsets.UTF_8).toUByteArray()

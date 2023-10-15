@@ -3,7 +3,7 @@ package jamule.ec.tag
 import jamule.ec.toUByteArray
 import org.slf4j.Logger
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 class TagEncoder(
     private val logger: Logger
 ) {

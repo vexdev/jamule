@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalUnsignedTypes::class)
-
 package jamule.ec.packet
 
 import jamule.ec.*
@@ -10,6 +8,7 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.util.zip.Inflater
 
+@ExperimentalUnsignedTypes
 class PacketParser(
     private val tagParser: TagParser,
     private val logger: Logger
@@ -64,7 +63,7 @@ class PacketParser(
         val tagsCount = payload.readUint16(flags.utf8, INDEX_TAG_COUNT).toInt()
         logger.debug("Packet has {} tags", tagsCount)
         val tagList = mutableListOf<Tag<*>>()
-        val opCode = ECOpCode.fromValue(payload[0].toUByte())
+        val opCode = ECOpCode.fromValue(payload[0])
         logger.debug("Packet opcode is {}", opCode)
         var index = tagsIndex
         var tagCounter = 0

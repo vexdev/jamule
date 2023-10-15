@@ -3,7 +3,7 @@ package jamule.ec.tag
 import jamule.ec.*
 import org.slf4j.Logger
 
-@OptIn(ExperimentalStdlibApi::class, ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 class TagParser(
     private val logger: Logger
 ) {
@@ -17,6 +17,7 @@ class TagParser(
         parseWithMetadata(payload, index, utf)
             .let { (tag, meta) -> Pair(tag, meta.endIndex) }
 
+    @OptIn(ExperimentalStdlibApi::class)
     private fun parseWithMetadata(payload: UByteArray, tagNameIndex: Int, utf: Boolean): Pair<Tag<out Any>, TagMeta> {
         // First part is the tag name and the flag indicating if it has subtags
         // As per docs, it's the last bit of the tag name
@@ -27,7 +28,7 @@ class TagParser(
 
         // Then is the tag type
         val tagTypeIndex = tagNameIndex + payload[tagNameIndex].numberLength(utf, TAG_NAME_SIZE)
-        val tagType = ECTagType.fromValue(payload[tagTypeIndex].toUByte())
+        val tagType = ECTagType.fromValue(payload[tagTypeIndex])
         logger.trace("Tag type: {}", tagType)
 
         // Then is the tag length, indicating the tag's own content length + length of children (with headers)

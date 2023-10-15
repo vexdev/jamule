@@ -1,10 +1,9 @@
-@file:OptIn(ExperimentalUnsignedTypes::class)
-
 package jamule.ec
 
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalUnsignedTypes::class)
 class EncodingTest {
 
     @Test

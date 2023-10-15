@@ -9,6 +9,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalUnsignedTypes::class)
 class PacketParserTest {
     private val logger: Logger = LoggerFactory.getLogger(PacketParserTest::class.java)
 

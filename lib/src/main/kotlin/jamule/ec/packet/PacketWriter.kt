@@ -7,10 +7,10 @@ import org.slf4j.Logger
 import java.io.OutputStream
 import java.util.zip.Deflater
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 class PacketWriter(
-    private val logger: Logger,
     private val tagEncoder: TagEncoder,
+    private val logger: Logger,
 ) {
 
     fun write(
