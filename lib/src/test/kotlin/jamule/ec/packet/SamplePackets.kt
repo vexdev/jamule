@@ -24,7 +24,7 @@ class SamplePackets {
                     CustomTag(ECTagName.EC_TAG_CAN_ZLIB, UByteArray(0)),
                     CustomTag(ECTagName.EC_TAG_CAN_UTF8_NUMBERS, UByteArray(0)),
                 ),
-                Flags(zlibCompressed = false, utf8 = true, hasId = false, accepts = false)
+                Flags()
             ),
             // Auth Response
             "000000220000000d4f0116050855099a4aea510c43".hexToByteArray() to Packet(
@@ -32,7 +32,7 @@ class SamplePackets {
                 listOf(
                     ULongTag(ECTagName.EC_TAG_PASSWD_SALT, "55099a4aea510c43".hexToULong()),
                 ),
-                Flags(zlibCompressed = false, utf8 = true, hasId = false, accepts = false)
+                Flags()
             ),
             // Auth Passwd Request
             "00000022000000155001020910ca9026415e1a7df7ec0f7ec69678c150".hexToByteArray() to Packet(
@@ -40,7 +40,7 @@ class SamplePackets {
                 listOf(
                     Hash16Tag(ECTagName.EC_TAG_PASSWD_HASH, "ca9026415e1a7df7ec0f7ec69678c150".hexToUByteArray()),
                 ),
-                Flags(zlibCompressed = false, utf8 = true, hasId = false, accepts = false)
+                Flags()
             ),
             // Auth Ok Response
             ("000000220000001d0401e0a8960616322e332e31204164756e616e7a4120" +
@@ -49,7 +49,7 @@ class SamplePackets {
                 listOf(
                     StringTag(ECTagName.EC_TAG_SERVER_VERSION, "2.3.1 AdunanzA 2012.1"),
                 ),
-                Flags(zlibCompressed = false, utf8 = true, hasId = false, accepts = false)
+                Flags()
             ),
             // Status Request
             "00000022000000060a0108020100".hexToByteArray() to Packet(
@@ -57,7 +57,7 @@ class SamplePackets {
                 listOf(
                     UByteTag(ECTagName.EC_TAG_DETAIL_LEVEL, ECDetailLevel.EC_DETAIL_CMD.value),
                 ),
-                Flags(zlibCompressed = false, utf8 = true, hasId = false, accepts = false)
+                Flags()
             ),
         )
 

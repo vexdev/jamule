@@ -4,7 +4,7 @@ import jamule.ec.ECOpCode
 import jamule.ec.ECTagName
 import jamule.ec.tag.*
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 data class Packet(
     val opCode: ECOpCode = ECOpCode.EC_OP_NOOP,
     val tags: List<Tag<*>> = mutableListOf(),

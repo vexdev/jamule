@@ -3,6 +3,7 @@ package jamule.ec.packet
 import jamule.ec.*
 import jamule.ec.tag.Tag
 import jamule.ec.tag.TagParser
+import jamule.exception.InvalidECException
 import org.slf4j.Logger
 import java.io.ByteArrayOutputStream
 import java.io.InputStream

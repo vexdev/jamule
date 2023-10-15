@@ -3,7 +3,6 @@ package jamule.ec.tag
 import jamule.ec.*
 import java.math.BigInteger
 
-@ExperimentalUnsignedTypes
 sealed class Tag<T : Any>(
     open val name: ECTagName,
     val type: ECTagType,
@@ -13,6 +12,7 @@ sealed class Tag<T : Any>(
     private val subTags: List<Tag<*>> = emptyList()
     private lateinit var value: T
 
+    @OptIn(ExperimentalUnsignedTypes::class)
     abstract fun parseValue(value: UByteArray)
 
     fun getValue() = value
@@ -22,6 +22,7 @@ sealed class Tag<T : Any>(
         this.value = value
     }
 
+    @OptIn(ExperimentalUnsignedTypes::class)
     abstract fun encodeValue(): UByteArray
 }
 
@@ -33,14 +34,15 @@ data class CustomTag(override val name: ECTagName, override val subtags: List<Ta
         setValue(value)
     }
 
+    @ExperimentalUnsignedTypes
     override fun encodeValue(): UByteArray = getValue()
 
+    @ExperimentalUnsignedTypes
     override fun parseValue(value: UByteArray) {
         setValue(value)
     }
 }
 
-@ExperimentalUnsignedTypes
 data class UByteTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
     Tag<UByte>(name, ECTagType.EC_TAGTYPE_UINT8, subtags) {
 
@@ -48,8 +50,12 @@ data class UByteTag(override val name: ECTagName, override val subtags: List<Tag
         setValue(value)
     }
 
+
+    @ExperimentalUnsignedTypes
     override fun encodeValue(): UByteArray = ubyteArrayOf(getValue())
 
+
+    @ExperimentalUnsignedTypes
     override fun parseValue(value: UByteArray) {
         if (value.isEmpty()) setValue(0u)
         else if (value.size == 1) setValue(value[0])
@@ -57,7 +63,6 @@ data class UByteTag(override val name: ECTagName, override val subtags: List<Tag
     }
 }
 
-@ExperimentalUnsignedTypes
 data class UShortTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
     Tag<UShort>(name, ECTagType.EC_TAGTYPE_UINT16, subtags) {
 
@@ -65,8 +70,12 @@ data class UShortTag(override val name: ECTagName, override val subtags: List<Ta
         setValue(value)
     }
 
+
+    @ExperimentalUnsignedTypes
     override fun encodeValue(): UByteArray = getValue().toUByteArray()
 
+
+    @ExperimentalUnsignedTypes
     override fun parseValue(value: UByteArray) {
         if (value.isEmpty()) setValue(0u)
         else if (value.size == 2) setValue(value.readUint16(false, 0).toUShort())
@@ -74,7 +83,6 @@ data class UShortTag(override val name: ECTagName, override val subtags: List<Ta
     }
 }
 
-@ExperimentalUnsignedTypes
 data class UIntTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
     Tag<UInt>(name, ECTagType.EC_TAGTYPE_UINT32, subtags) {
 
@@ -82,8 +90,12 @@ data class UIntTag(override val name: ECTagName, override val subtags: List<Tag<
         setValue(value)
     }
 
+
+    @ExperimentalUnsignedTypes
     override fun encodeValue(): UByteArray = getValue().toUByteArray()
 
+
+    @ExperimentalUnsignedTypes
     override fun parseValue(value: UByteArray) {
         if (value.isEmpty()) setValue(0u)
         else if (value.size == 4) setValue(value.readUInt32(false, 0))
@@ -91,7 +103,6 @@ data class UIntTag(override val name: ECTagName, override val subtags: List<Tag<
     }
 }
 
-@ExperimentalUnsignedTypes
 data class ULongTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
     Tag<ULong>(name, ECTagType.EC_TAGTYPE_UINT64, subtags) {
 
@@ -99,8 +110,10 @@ data class ULongTag(override val name: ECTagName, override val subtags: List<Tag
         setValue(value)
     }
 
+    @ExperimentalUnsignedTypes
     override fun encodeValue(): UByteArray = getValue().toUByteArray()
 
+    @ExperimentalUnsignedTypes
     override fun parseValue(value: UByteArray) {
         if (value.isEmpty()) setValue(0u)
         else if (value.size == 8) setValue(value.toUInt64())
@@ -108,7 +121,6 @@ data class ULongTag(override val name: ECTagName, override val subtags: List<Tag
     }
 }
 
-@ExperimentalUnsignedTypes
 data class UInt128Tag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
     Tag<BigInteger>(name, ECTagType.EC_TAGTYPE_UINT128, subtags) {
 
@@ -116,15 +128,16 @@ data class UInt128Tag(override val name: ECTagName, override val subtags: List<T
         setValue(value)
     }
 
+    @ExperimentalUnsignedTypes
     override fun encodeValue(): UByteArray = getValue().toByteArray().toUByteArray()
 
+    @ExperimentalUnsignedTypes
     override fun parseValue(value: UByteArray) {
         if (value.isEmpty()) setValue(BigInteger.ZERO)
         else setValue(BigInteger(value.toByteArray()))
     }
 }
 
-@ExperimentalUnsignedTypes
 data class StringTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
     Tag<String>(name, ECTagType.EC_TAGTYPE_STRING, subtags) {
 
@@ -132,15 +145,16 @@ data class StringTag(override val name: ECTagName, override val subtags: List<Ta
         setValue(value)
     }
 
+    @ExperimentalUnsignedTypes
     override fun encodeValue(): UByteArray = getValue().toByteArray().toUByteArray() + 0x00.toUByte()
 
+    @ExperimentalUnsignedTypes
     override fun parseValue(value: UByteArray) {
         if (value[value.size - 1] != 0x00.toUByte()) throw IllegalArgumentException("StringTag value must be null terminated")
         else setValue(value.toByteArray().decodeToString().trimEnd(0.toChar()))
     }
 }
 
-@ExperimentalUnsignedTypes
 data class DoubleTag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
     Tag<Double>(name, ECTagType.EC_TAGTYPE_DOUBLE, subtags) {
 
@@ -148,15 +162,16 @@ data class DoubleTag(override val name: ECTagName, override val subtags: List<Ta
         setValue(value)
     }
 
+    @ExperimentalUnsignedTypes
     override fun encodeValue(): UByteArray = getValue().toString().toByteArray().toUByteArray() + 0x00.toUByte()
 
+    @ExperimentalUnsignedTypes
     override fun parseValue(value: UByteArray) {
         if (value[value.size - 1] != 0x00.toUByte()) throw IllegalArgumentException("DoubleTag value must be null terminated")
         else setValue(value.toByteArray().decodeToString().trimEnd(0.toChar()).toDouble())
     }
 }
 
-@ExperimentalUnsignedTypes
 data class Ipv4Tag(override val name: ECTagName, override val subtags: List<Tag<out Any>> = listOf()) :
     Tag<Ipv4Tag.Ipv4>(name, ECTagType.EC_TAGTYPE_IPV4, subtags) {
 
@@ -164,9 +179,11 @@ data class Ipv4Tag(override val name: ECTagName, override val subtags: List<Tag<
         setValue(value)
     }
 
+    @ExperimentalUnsignedTypes
     override fun encodeValue(): UByteArray =
         getValue().address.split(".").map { it.toUByte() }.toUByteArray() + getValue().port.toUByteArray()
 
+    @ExperimentalUnsignedTypes
     override fun parseValue(value: UByteArray) {
         // IPV4 is 4 bytes long, the last 2 bytes are used for the port
         if (value.size != 6) throw IllegalArgumentException("Ipv4Tag value must be 6 bytes long")
@@ -189,8 +206,10 @@ data class Hash16Tag(override val name: ECTagName, override val subtags: List<Ta
         setValue(value)
     }
 
+    @ExperimentalUnsignedTypes
     override fun encodeValue(): UByteArray = getValue()
 
+    @ExperimentalUnsignedTypes
     override fun parseValue(value: UByteArray) {
         if (value.size == 16) setValue(value)
         else throw IllegalArgumentException("Hash16Tag value must be 16 bytes long")

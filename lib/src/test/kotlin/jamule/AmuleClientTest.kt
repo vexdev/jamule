@@ -24,6 +24,6 @@ class AmuleClientTest : FunSpec({
     val amuleClient = AmuleClient(amule.host, 4712, logger = logger)
 
     test("authenticate should not fail") {
-        amuleClient.authenticate("password")
+        amuleClient.authenticate("amule")
     }
 })

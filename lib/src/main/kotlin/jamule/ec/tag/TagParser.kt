@@ -1,6 +1,7 @@
 package jamule.ec.tag
 
 import jamule.ec.*
+import jamule.exception.InvalidECException
 import org.slf4j.Logger
 
 @ExperimentalUnsignedTypes

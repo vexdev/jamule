@@ -1,6 +1,6 @@
 package jamule.ec.packet
 
-import jamule.ec.InvalidECException
+import jamule.exception.InvalidECException
 import jamule.ec.tag.TagEncoder
 import jamule.ec.toUByteArray
 import org.slf4j.Logger
