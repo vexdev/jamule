@@ -19,14 +19,14 @@ data class SearchResultsResponse(val files: List<SearchFile>) : Response {
                     SearchFile(
                         fileName = tag.subtags.string(ECTagName.EC_TAG_PARTFILE_NAME)!!.getValue(),
                         hash = tag.subtags.hash16(ECTagName.EC_TAG_PARTFILE_HASH)!!.getValue().toByteArray(),
-                        sizeFull = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SIZE_FULL)!!.getNumber(),
+                        sizeFull = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SIZE_FULL)?.getNumber() ?: 0,
                         downloadStatus = SearchFileDownloadStatus.fromECStatus(
                             tag.subtags.byte(ECTagName.EC_TAG_PARTFILE_STATUS)!!.getValue()
                                 .let { ECSearchFileDownloadStatus.fromValue(it) }
                         ),
-                        completeSourceCount = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SOURCE_COUNT_XFER)!!
-                            .getNumber(),
-                        sourceCount = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SOURCE_COUNT)!!.getNumber(),
+                        completeSourceCount = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SOURCE_COUNT_XFER)
+                            ?.getNumber() ?: 0,
+                        sourceCount = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SOURCE_COUNT)?.getNumber() ?: 0,
                     )
                 } else {
                     throw CommunicationException("Unexpected tag ${tag.name} in SearchResultsResponse")

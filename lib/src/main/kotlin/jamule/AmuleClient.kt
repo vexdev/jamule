@@ -105,6 +105,11 @@ class AmuleClient(
         timeout: Duration = 5.seconds,
     ): SearchResultsResponse {
         searchAsync(query, searchType, filters)
+        // For some reason, the server returns always 100 if we don't wait a bit
+        for (i in 0..<15) {
+            searchStatus()
+            Thread.sleep(200)
+        }
         val start = System.currentTimeMillis()
         while (searchStatus() < 1f) {
             if (System.currentTimeMillis() - start > timeout.inWholeMilliseconds) {
