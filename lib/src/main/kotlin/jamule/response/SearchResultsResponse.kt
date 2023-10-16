@@ -1,5 +1,6 @@
 package jamule.response
 
+import jamule.ec.ECOpCode
 import jamule.ec.ECSearchFileDownloadStatus
 import jamule.ec.ECTagName
 import jamule.ec.packet.Packet
@@ -13,6 +14,8 @@ data class SearchResultsResponse(val files: List<SearchFile>) : Response {
 
     companion object {
         @OptIn(ExperimentalUnsignedTypes::class)
+        @ResponseDeserializer(ECOpCode.EC_OP_SEARCH_RESULTS)
+        @JvmStatic
         internal fun fromPacket(packet: Packet) = SearchResultsResponse(
             packet.tags.map { tag ->
                 if (tag.name == ECTagName.EC_TAG_SEARCHFILE) {

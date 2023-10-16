@@ -16,6 +16,8 @@ repositories {
 dependencies {
     implementation("com.google.guava:guava:32.1.1-jre")
     implementation("org.slf4j:slf4j-api:2.0.9")
+    implementation(kotlin("reflect"))
+    implementation("org.reflections:reflections:0.10.2")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

@@ -1,5 +1,6 @@
 package jamule.response
 
+import jamule.ec.ECOpCode
 import jamule.ec.ECTagName
 import jamule.ec.packet.Packet
 
@@ -31,6 +32,8 @@ data class StatsResponse(
 
     ) : Response {
     companion object {
+        @ResponseDeserializer(ECOpCode.EC_OP_STATS)
+        @JvmStatic
         internal fun fromPacket(packet: Packet) = StatsResponse(
             packet.numeric(ECTagName.EC_TAG_STATS_UL_SPEED)?.getNumber() ?: 0,
             packet.numeric(ECTagName.EC_TAG_STATS_DL_SPEED)?.getNumber() ?: 0,

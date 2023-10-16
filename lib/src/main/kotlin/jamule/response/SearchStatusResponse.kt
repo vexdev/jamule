@@ -1,10 +1,13 @@
 package jamule.response
 
+import jamule.ec.ECOpCode
 import jamule.ec.ECTagName
 import jamule.ec.packet.Packet
 
 data class SearchStatusResponse(val status: Float) : Response {
     companion object {
+        @ResponseDeserializer(ECOpCode.EC_OP_SEARCH_PROGRESS)
+        @JvmStatic
         internal fun fromPacket(packet: Packet) = SearchStatusResponse(
             packet.numeric(ECTagName.EC_TAG_SEARCH_STATUS)!!.getNumber().let { num ->
                 // Local searches always return 0xFFFF

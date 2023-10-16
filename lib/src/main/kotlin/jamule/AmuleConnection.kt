@@ -28,8 +28,6 @@ internal class AmuleConnection(
     @OptIn(ExperimentalUnsignedTypes::class)
     private val packetWriter = PacketWriter(tagEncoder, logger)
 
-    private val responseParser = ResponseParser(logger)
-
     @OptIn(ExperimentalUnsignedTypes::class)
     fun sendRequest(request: Request): Response {
         val outputStream = socket.getOutputStream()
@@ -37,7 +35,7 @@ internal class AmuleConnection(
         val packet = request.packet()
         packetWriter.write(packet, outputStream)
         val responsePacket = packetParser.parse(inputStream)
-        return responseParser.parse(responsePacket).also {
+        return ResponseParser.parse(responsePacket).also {
             if (it is ErrorResponse) {
                 throw ServerException(it.message)
             }

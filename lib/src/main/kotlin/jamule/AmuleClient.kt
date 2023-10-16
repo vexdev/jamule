@@ -120,6 +120,18 @@ class AmuleClient(
         return searchResults()
     }
 
+    /**
+     * Stops a search that is in progress.
+     */
+    fun searchStop() {
+        logger.info("Stopping search...")
+        val searchStopResponse = amuleConnection.sendRequest(SearchStopRequest())
+        if (searchStopResponse !is MiscDataResponse) {
+            throw CommunicationException("Unable to stop search")
+        }
+        logger.info("Search stopped")
+    }
+
     companion object {
         const val CLIENT_NAME = "jAmule"
     }

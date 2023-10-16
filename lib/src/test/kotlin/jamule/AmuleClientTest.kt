@@ -44,4 +44,9 @@ class AmuleClientTest : FunSpec({
         amuleClient.searchResults()
     }
 
+    test("should stop searches") {
+        amuleClient.searchAsync("linux")
+        amuleClient.searchStop()
+    }
+
 })
