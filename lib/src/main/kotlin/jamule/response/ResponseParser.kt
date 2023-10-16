@@ -4,7 +4,7 @@ import jamule.ec.ECOpCode
 import jamule.ec.packet.Packet
 import org.slf4j.Logger
 
-class ResponseParser(
+internal class ResponseParser(
     private val logger: Logger
 ) {
 
@@ -44,8 +44,8 @@ class ResponseParser(
             ECOpCode.EC_OP_RENAME_FILE -> TODO()
             ECOpCode.EC_OP_SEARCH_START -> TODO()
             ECOpCode.EC_OP_SEARCH_STOP -> TODO()
-            ECOpCode.EC_OP_SEARCH_RESULTS -> TODO()
-            ECOpCode.EC_OP_SEARCH_PROGRESS -> TODO()
+            ECOpCode.EC_OP_SEARCH_RESULTS -> SearchResultsResponse.fromPacket(packet)
+            ECOpCode.EC_OP_SEARCH_PROGRESS -> SearchStatusResponse.fromPacket(packet)
             ECOpCode.EC_OP_DOWNLOAD_SEARCH_RESULT -> TODO()
             ECOpCode.EC_OP_IPFILTER_RELOAD -> TODO()
             ECOpCode.EC_OP_GET_SERVER_LIST -> TODO()

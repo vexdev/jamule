@@ -480,3 +480,18 @@ enum class ECTagType(val value: UByte) {
         }
     }
 }
+
+// Possible download status of a file
+internal enum class ECSearchFileDownloadStatus(val value: UByte) {
+    NEW(0u),                // not known
+    DOWNLOADED(1u),        // successfully downloaded or shared
+    QUEUED(2u),            // downloading (Partfile)
+    CANCELED(3u),            // canceled
+    QUEUEDCANCELED(4u);    // canceled once, but now downloading again
+
+    companion object {
+        fun fromValue(value: UByte): ECSearchFileDownloadStatus {
+            return entries.first { it.value == value }
+        }
+    }
+}

@@ -9,7 +9,7 @@ import jamule.ec.ECTagName
 import jamule.ec.tag.*
 
 @OptIn(ExperimentalStdlibApi::class)
-class SamplePackets {
+internal class SamplePackets {
 
     companion object {
 

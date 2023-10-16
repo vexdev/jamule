@@ -10,7 +10,7 @@ import java.io.InputStream
 import java.util.zip.Inflater
 
 @ExperimentalUnsignedTypes
-class PacketParser(
+internal class PacketParser(
     private val tagParser: TagParser,
     private val logger: Logger
 ) {

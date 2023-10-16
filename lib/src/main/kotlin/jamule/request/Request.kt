@@ -2,7 +2,6 @@ package jamule.request
 
 import jamule.ec.packet.Packet
 
-interface Request {
-    @OptIn(ExperimentalUnsignedTypes::class)
+internal interface Request {
     fun packet(): Packet
 }

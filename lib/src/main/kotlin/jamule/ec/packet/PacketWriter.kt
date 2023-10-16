@@ -1,14 +1,14 @@
 package jamule.ec.packet
 
-import jamule.exception.InvalidECException
 import jamule.ec.tag.TagEncoder
 import jamule.ec.toUByteArray
+import jamule.exception.InvalidECException
 import org.slf4j.Logger
 import java.io.OutputStream
 import java.util.zip.Deflater
 
 @ExperimentalUnsignedTypes
-class PacketWriter(
+internal class PacketWriter(
     private val tagEncoder: TagEncoder,
     private val logger: Logger,
 ) {
@@ -58,7 +58,7 @@ class PacketWriter(
         val tagCount = packet.tags.size.toUShort().toUByteArray(packet.flags.utf8)
         val tags = List(packet.tags.size) { i ->
             tagEncoder.encode(packet.tags[i], packet.flags.utf8)
-        }.reduce { acc, bytes -> acc + bytes }
+        }.reduceOrNull { acc, bytes -> acc + bytes } ?: UByteArray(0)
         return UByteArray(0) + opCode + tagCount + tags
     }
 

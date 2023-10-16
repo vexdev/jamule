@@ -11,7 +11,7 @@ import jamule.ec.tag.CustomTag
 import jamule.ec.tag.StringTag
 import jamule.ec.tag.UShortTag
 
-class SaltRequest : Request {
+internal class SaltRequest : Request {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun packet(): Packet = Packet(
         ECOpCode.EC_OP_AUTH_REQ,

@@ -3,6 +3,10 @@ package jamule.ec.tag
 import jamule.ec.*
 import java.math.BigInteger
 
+interface NumericTag {
+    fun getNumber(): Int
+}
+
 sealed class Tag<T : Any>(
     open val name: ECTagName,
     val type: ECTagType,
@@ -52,8 +56,8 @@ data class UByteTag(
     override val name: ECTagName,
     override val subtags: List<Tag<out Any>> = listOf(),
     override val nameValue: UShort = name.value
-) :
-    Tag<UByte>(name, ECTagType.EC_TAGTYPE_UINT8, subtags, nameValue) {
+) : Tag<UByte>(name, ECTagType.EC_TAGTYPE_UINT8, subtags, nameValue),
+    NumericTag {
 
     constructor(name: ECTagName, value: UByte, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -70,14 +74,16 @@ data class UByteTag(
         else if (value.size == 1) setValue(value[0])
         else throw IllegalArgumentException("UInt8Tag value must be 1 byte long")
     }
+
+    override fun getNumber(): Int = getValue().toInt()
 }
 
 data class UShortTag(
     override val name: ECTagName,
     override val subtags: List<Tag<out Any>> = listOf(),
     override val nameValue: UShort = name.value
-) :
-    Tag<UShort>(name, ECTagType.EC_TAGTYPE_UINT16, subtags, nameValue) {
+) : Tag<UShort>(name, ECTagType.EC_TAGTYPE_UINT16, subtags, nameValue),
+    NumericTag {
 
     constructor(name: ECTagName, value: UShort, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -94,14 +100,16 @@ data class UShortTag(
         else if (value.size == 2) setValue(value.readUint16(false, 0).toUShort())
         else throw IllegalArgumentException("UInt16Tag value must be 2 bytes long")
     }
+
+    override fun getNumber(): Int = getValue().toInt()
 }
 
 data class UIntTag(
     override val name: ECTagName,
     override val subtags: List<Tag<out Any>> = listOf(),
     override val nameValue: UShort = name.value
-) :
-    Tag<UInt>(name, ECTagType.EC_TAGTYPE_UINT32, subtags, nameValue) {
+) : Tag<UInt>(name, ECTagType.EC_TAGTYPE_UINT32, subtags, nameValue),
+    NumericTag {
 
     constructor(name: ECTagName, value: UInt, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -118,6 +126,8 @@ data class UIntTag(
         else if (value.size == 4) setValue(value.readUInt32(false, 0))
         else throw IllegalArgumentException("UInt32Tag value must be 4 bytes long")
     }
+
+    override fun getNumber(): Int = getValue().toInt()
 }
 
 data class ULongTag(

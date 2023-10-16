@@ -3,14 +3,13 @@ package jamule.request
 import jamule.ec.ECOpCode
 import jamule.ec.ECSearchType
 import jamule.ec.ECTagName
-import jamule.ec.packet.Flags
 import jamule.ec.packet.Packet
 import jamule.ec.tag.StringTag
 import jamule.ec.tag.Tag
 import jamule.ec.tag.UByteTag
 import jamule.ec.tag.ULongTag
 
-data class SearchRequest(
+internal data class SearchRequest(
     val query: String,
     val type: SearchType,
     val filters: SearchFilters,
@@ -37,19 +36,20 @@ data class SearchRequest(
             listOf(ULongTag(ECTagName.EC_TAG_SEARCH_AVAILABILITY, filters.availability)) else emptyList(),
     )
 
-    data class SearchFilters(
-        val filetype: String? = null,
-        val extension: String? = null,
-        val minSize: ULong? = null,
-        val maxSize: ULong? = null,
-        val availability: ULong? = null,
-    )
 
-    enum class SearchType(val ecSearchType: ECSearchType) {
-        GLOBAL(ecSearchType = ECSearchType.EC_SEARCH_GLOBAL),
-        KAD(ecSearchType = ECSearchType.EC_SEARCH_KAD),
-        LOCAL(ecSearchType = ECSearchType.EC_SEARCH_LOCAL),
-        WEB(ecSearchType = ECSearchType.EC_SEARCH_WEB),
-    }
+}
 
+data class SearchFilters(
+    val filetype: String? = null,
+    val extension: String? = null,
+    val minSize: ULong? = null,
+    val maxSize: ULong? = null,
+    val availability: ULong? = null,
+)
+
+enum class SearchType(val ecSearchType: ECSearchType) {
+    GLOBAL(ecSearchType = ECSearchType.EC_SEARCH_GLOBAL),
+    KAD(ecSearchType = ECSearchType.EC_SEARCH_KAD),
+    LOCAL(ecSearchType = ECSearchType.EC_SEARCH_LOCAL),
+    WEB(ecSearchType = ECSearchType.EC_SEARCH_WEB),
 }

@@ -4,13 +4,15 @@ import jamule.ec.packet.PacketParser
 import jamule.ec.packet.PacketWriter
 import jamule.ec.tag.TagEncoder
 import jamule.ec.tag.TagParser
+import jamule.exception.ServerException
 import jamule.request.Request
+import jamule.response.ErrorResponse
 import jamule.response.Response
 import jamule.response.ResponseParser
 import org.slf4j.Logger
 import java.net.Socket
 
-class AmuleConnection(
+internal class AmuleConnection(
     private val socket: Socket,
     private val logger: Logger
 ) : AutoCloseable by socket {
@@ -35,6 +37,10 @@ class AmuleConnection(
         val packet = request.packet()
         packetWriter.write(packet, outputStream)
         val responsePacket = packetParser.parse(inputStream)
-        return responseParser.parse(responsePacket)
+        return responseParser.parse(responsePacket).also {
+            if (it is ErrorResponse) {
+                throw ServerException(it.message)
+            }
+        }
     }
 }

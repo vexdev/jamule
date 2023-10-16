@@ -7,7 +7,7 @@ import jamule.ec.packet.Packet
 import jamule.ec.tag.Hash16Tag
 
 @ExperimentalUnsignedTypes
-data class AuthRequest(val hashedPassword: UByteArray) : Request {
+internal data class AuthRequest(val hashedPassword: UByteArray) : Request {
     override fun packet(): Packet = Packet(
         ECOpCode.EC_OP_AUTH_PASSWD,
         listOf(
