@@ -1,6 +1,5 @@
 package jamule
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import jamule.ec.packet.PacketParserTest
 import org.slf4j.Logger
