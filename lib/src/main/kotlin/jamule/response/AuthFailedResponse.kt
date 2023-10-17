@@ -4,7 +4,7 @@ import jamule.ec.ECOpCode
 import jamule.ec.ECTagName
 import jamule.ec.packet.Packet
 
-data class AuthFailedResponse(val reason: String) : Response {
+data class AuthFailedResponse(val reason: String) : Exception(reason), Response {
     companion object {
         @ResponseDeserializer(ECOpCode.EC_OP_AUTH_FAIL)
         @JvmStatic

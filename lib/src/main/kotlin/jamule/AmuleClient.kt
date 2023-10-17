@@ -1,7 +1,6 @@
 package jamule
 
 import jamule.auth.PasswordHasher
-import jamule.exception.AuthFailedException
 import jamule.exception.CommunicationException
 import jamule.request.*
 import jamule.response.*
@@ -22,35 +21,37 @@ class AmuleClient(
 
     override fun close() = amuleConnection.close()
 
+    /**
+     * Authenticates with the server, returning the server version.
+     */
     @OptIn(ExperimentalUnsignedTypes::class)
-    fun authenticate(password: String) {
+    fun authenticate(password: String): Result<String> {
         logger.info("Authenticating...")
-        val authSalt = amuleConnection.sendRequest(SaltRequest())
-        if (authSalt !is AuthSaltResponse) {
-            throw CommunicationException("Unable to get auth salt")
+        val saltResponse = amuleConnection.sendRequest(SaltRequest())
+        when (saltResponse) {
+            is AuthFailedResponse -> return Result.failure(saltResponse)
+            !is AuthSaltResponse -> return Result.failure(CommunicationException("Unable to get auth salt"))
+            else -> Unit
         }
-        val saltedPassword = PasswordHasher.hash(password, authSalt.salt)
-        val authResponse = amuleConnection.sendRequest(AuthRequest(saltedPassword))
-        if (authResponse !is AuthOkResponse) {
-            if (authResponse is AuthFailedResponse)
-                throw AuthFailedException("Auth failed: ${authResponse.reason}")
-            else
-                throw CommunicationException("Unable to authenticate")
+        val saltedPassword = PasswordHasher.hash(password, saltResponse.salt)
+        return when (val response = amuleConnection.sendRequest(AuthRequest(saltedPassword))) {
+            is AuthOkResponse -> Result.success(response.version)
+                .also { logger.info("Authenticated with server version ${response.version}") }
+
+            is AuthFailedResponse -> Result.failure(response)
+            else -> Result.failure(CommunicationException("Unable to authenticate"))
         }
-        logger.info("Authenticated with server version ${authResponse.version}")
     }
 
     /**
      * Queries the server for statistics.
      */
-    fun getStats(): StatsResponse {
+    fun getStats(): Result<StatsResponse> {
         logger.info("Getting stats...")
-        val statsResponse = amuleConnection.sendRequest(StatsRequest())
-        if (statsResponse !is StatsResponse) {
-            throw CommunicationException("Unable to get stats")
+        return when (val response = amuleConnection.sendRequest(StatsRequest())) {
+            is StatsResponse -> Result.success(response).also { logger.info("Stats: $response") }
+            else -> Result.failure(CommunicationException("Unable to get stats"))
         }
-        logger.info("Stats: $statsResponse")
-        return statsResponse
     }
 
     /**
@@ -60,39 +61,39 @@ class AmuleClient(
         query: String,
         searchType: SearchType = SearchType.GLOBAL,
         filters: SearchFilters = SearchFilters(),
-    ) {
+    ): Result<String> {
         logger.info("Searching for $query...")
-        val searchResponse = amuleConnection.sendRequest(SearchRequest(query, searchType, filters))
-        if (searchResponse !is StringsResponse) {
-            throw CommunicationException("Unable to search")
+        return when (val response = amuleConnection.sendRequest(SearchRequest(query, searchType, filters))) {
+            is StringsResponse -> Result.success(response.string).also { logger.info("Search started") }
+            is ErrorResponse -> Result.failure(response)
+            else -> Result.failure(CommunicationException("Unable to start search"))
         }
-        logger.info("Search: ${searchResponse.string}")
     }
 
     /**
      * Gets the status of a search, as a float 0-1.
      */
-    fun searchStatus(): Float {
+    fun searchStatus(): Result<Float> {
         logger.info("Getting search status...")
-        val searchStatusResponse = amuleConnection.sendRequest(SearchStatusRequest())
-        if (searchStatusResponse !is SearchStatusResponse) {
-            throw CommunicationException("Unable to get search status")
+        return when (val response = amuleConnection.sendRequest(SearchStatusRequest())) {
+            is SearchStatusResponse -> Result.success(response.status)
+                .also { logger.info("Search status: ${response.status}") }
+
+            else -> Result.failure(CommunicationException("Unable to get search status"))
         }
-        logger.info("Search status: ${searchStatusResponse.status}")
-        return searchStatusResponse.status
     }
 
     /**
      * Gets the results of a search.
      */
-    fun searchResults(): SearchResultsResponse {
+    fun searchResults(): Result<SearchResultsResponse> {
         logger.info("Getting search results...")
-        val searchResultsResponse = amuleConnection.sendRequest(SearchResultsRequest())
-        if (searchResultsResponse !is SearchResultsResponse) {
-            throw CommunicationException("Unable to get search results")
+        return when (val response = amuleConnection.sendRequest(SearchResultsRequest())) {
+            is SearchResultsResponse -> Result.success(response)
+                .also { logger.info("Found ${response.files} results") }
+
+            else -> Result.failure(CommunicationException("Unable to get search results"))
         }
-        logger.info("Search results: ${searchResultsResponse.files}")
-        return searchResultsResponse
     }
 
     /**
@@ -103,15 +104,15 @@ class AmuleClient(
         searchType: SearchType = SearchType.GLOBAL,
         filters: SearchFilters = SearchFilters(),
         timeout: Duration = 5.seconds,
-    ): SearchResultsResponse {
-        searchAsync(query, searchType, filters)
+    ): Result<SearchResultsResponse> {
+        searchAsync(query, searchType, filters).getOrElse { return Result.failure(it) }
         // For some reason, the server returns always 100 if we don't wait a bit
         for (i in 0..<15) {
-            searchStatus()
+            searchStatus().getOrElse { return Result.failure(it) }
             Thread.sleep(200)
         }
         val start = System.currentTimeMillis()
-        while (searchStatus() < 1f) {
+        while (searchStatus().getOrElse { return Result.failure(it) } < 1f) {
             if (System.currentTimeMillis() - start > timeout.inWholeMilliseconds) {
                 throw CommunicationException("Search timed out")
             }
@@ -123,13 +124,36 @@ class AmuleClient(
     /**
      * Stops a search that is in progress.
      */
-    fun searchStop() {
+    fun searchStop(): Result<Unit> {
         logger.info("Stopping search...")
-        val searchStopResponse = amuleConnection.sendRequest(SearchStopRequest())
-        if (searchStopResponse !is MiscDataResponse) {
-            throw CommunicationException("Unable to stop search")
+        return when (amuleConnection.sendRequest(SearchStopRequest())) {
+            is MiscDataResponse -> Result.success(Unit).also { logger.info("Search stopped") }
+            else -> Result.failure(CommunicationException("Unable to stop search"))
         }
-        logger.info("Search stopped")
+    }
+
+    /**
+     * Downloads a search result through its hash.
+     */
+    fun downloadSearchResult(hash: ByteArray): Result<Unit> {
+        logger.info("Downloading search result...")
+        return when (amuleConnection.sendRequest(DownloadSearchResultRequest(hash))) {
+            is StringsResponse -> Result.success(Unit).also { logger.info("Search result downloaded") }
+            else -> Result.failure(CommunicationException("Unable to download search result"))
+        }
+    }
+
+    /**
+     * Downloads an ed2k link in the following format:
+     * ed2k://|file|<filename>|<size>|<hash>|/
+     */
+    fun downloadEd2kLink(link: String): Result<Unit> {
+        logger.info("Downloading ed2k link...")
+        return when (val response = amuleConnection.sendRequest(AddLinkRequest(link))) {
+            is NoopResponse -> Result.success(Unit).also { logger.info("Ed2k link downloaded") }
+            is ErrorResponse -> Result.failure(response)
+            else -> Result.failure(CommunicationException("Unable to download ed2k link"))
+        }
     }
 
     companion object {

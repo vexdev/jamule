@@ -37,7 +37,7 @@ internal class AmuleConnection(
         val responsePacket = packetParser.parse(inputStream)
         return ResponseParser.parse(responsePacket).also {
             if (it is ErrorResponse) {
-                throw ServerException(it.message)
+                throw ServerException(it.serverMessage)
             }
         }
     }

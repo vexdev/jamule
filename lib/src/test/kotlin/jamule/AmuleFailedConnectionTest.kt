@@ -1,10 +1,9 @@
 package jamule
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import jamule.ec.packet.PacketParserTest
-import jamule.exception.AuthFailedException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.GenericContainer
@@ -25,9 +24,8 @@ class AmuleFailedConnectionTest : FunSpec({
     val amuleClient = AmuleClient(amule.host, 4712, logger = logger)
 
     test("authenticate should fail") {
-        val exception = shouldThrow<AuthFailedException> {
-            amuleClient.authenticate("invalid")
-        }
-        exception.message shouldBe "Auth failed: Authentication failed: wrong password."
+        val exception = amuleClient.authenticate("invalid").exceptionOrNull()
+        exception shouldNotBe null
+        exception!!.message shouldBe "Authentication failed: wrong password."
     }
 })
