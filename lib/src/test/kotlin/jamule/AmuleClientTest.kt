@@ -48,4 +48,8 @@ class AmuleClientTest : FunSpec({
         amuleClient.searchStop()
     }
 
+    test("should get download queue") {
+        amuleClient.getDownloadQueue()
+    }
+
 })

@@ -156,6 +156,14 @@ class AmuleClient(
         }
     }
 
+    /**
+     * Returns the full download queue of the server.
+     */
+    fun getDownloadQueue(): Result<Unit> {
+        amuleConnection.sendRequest(DownloadQueueRequest())
+        return TODO()
+    }
+
     companion object {
         const val CLIENT_NAME = "jAmule"
     }

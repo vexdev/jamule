@@ -4,7 +4,20 @@ import jamule.ec.*
 import java.math.BigInteger
 
 interface NumericTag {
-    fun getNumber(): Int
+    /**
+     * Gets a tag that can be any size up to a Short
+     */
+    fun getShort(): Short
+
+    /**
+     * Gets a tag that can be any size up to an Int
+     */
+    fun getInt(): Int
+
+    /**
+     * Gets a tag that can be any size up to a Long
+     */
+    fun getLong(): Long
 }
 
 sealed class Tag<T : Any>(
@@ -75,7 +88,9 @@ data class UByteTag(
         else throw IllegalArgumentException("UInt8Tag value must be 1 byte long")
     }
 
-    override fun getNumber(): Int = getValue().toInt()
+    override fun getShort(): Short = getValue().toShort()
+    override fun getInt(): Int = getValue().toInt()
+    override fun getLong(): Long = getValue().toLong()
 }
 
 data class UShortTag(
@@ -101,7 +116,9 @@ data class UShortTag(
         else throw IllegalArgumentException("UInt16Tag value must be 2 bytes long")
     }
 
-    override fun getNumber(): Int = getValue().toInt()
+    override fun getShort(): Short = getValue().toShort()
+    override fun getInt(): Int = getValue().toInt()
+    override fun getLong(): Long = getValue().toLong()
 }
 
 data class UIntTag(
@@ -127,7 +144,9 @@ data class UIntTag(
         else throw IllegalArgumentException("UInt32Tag value must be 4 bytes long")
     }
 
-    override fun getNumber(): Int = getValue().toInt()
+    override fun getShort(): Short = throw IllegalStateException("Unsigned Integer cannot be cast to short")
+    override fun getInt(): Int = getValue().toInt()
+    override fun getLong(): Long = getValue().toLong()
 }
 
 data class ULongTag(
@@ -135,7 +154,8 @@ data class ULongTag(
     override val subtags: List<Tag<out Any>> = listOf(),
     override val nameValue: UShort = name.value
 ) :
-    Tag<ULong>(name, ECTagType.EC_TAGTYPE_UINT64, subtags, nameValue) {
+    Tag<ULong>(name, ECTagType.EC_TAGTYPE_UINT64, subtags, nameValue),
+    NumericTag {
 
     constructor(name: ECTagName, value: ULong, subtags: List<Tag<out Any>> = listOf()) : this(name, subtags) {
         setValue(value)
@@ -150,6 +170,10 @@ data class ULongTag(
         else if (value.size == 8) setValue(value.toUInt64())
         else throw IllegalArgumentException("UInt64Tag value must be 8 bytes long")
     }
+
+    override fun getShort(): Short = throw IllegalStateException("Unsigned Long cannot be cast to short")
+    override fun getInt(): Int = throw IllegalStateException("Unsigned Long cannot be cast to int")
+    override fun getLong(): Long = getValue().toLong()
 }
 
 data class UInt128Tag(
