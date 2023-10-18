@@ -2,6 +2,7 @@ package jamule
 
 import jamule.auth.PasswordHasher
 import jamule.exception.CommunicationException
+import jamule.model.AmuleTransferringFile
 import jamule.request.*
 import jamule.response.*
 import org.slf4j.Logger
@@ -159,9 +160,12 @@ class AmuleClient(
     /**
      * Returns the full download queue of the server.
      */
-    fun getDownloadQueue(): Result<Unit> {
-        amuleConnection.sendRequest(DownloadQueueRequest())
-        return TODO()
+    fun getDownloadQueue(): Result<List<AmuleTransferringFile>> {
+        logger.info("Getting download queue...")
+        return when (val response = amuleConnection.sendRequest(DownloadQueueRequest())) {
+            is DownloadQueueResponse -> Result.success(response.partFiles)
+            else -> Result.failure(CommunicationException("Unable to get download queue"))
+        }
     }
 
     companion object {
