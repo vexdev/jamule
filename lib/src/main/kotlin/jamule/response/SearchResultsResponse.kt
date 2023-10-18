@@ -22,7 +22,7 @@ data class SearchResultsResponse(val files: List<SearchFile>) : Response {
                     SearchFile(
                         fileName = tag.subtags.string(ECTagName.EC_TAG_PARTFILE_NAME)!!.getValue(),
                         hash = tag.subtags.hash16(ECTagName.EC_TAG_PARTFILE_HASH)!!.getValue().toByteArray(),
-                        sizeFull = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SIZE_FULL)?.getInt() ?: 0,
+                        sizeFull = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SIZE_FULL)?.getLong() ?: 0,
                         downloadStatus = SearchFileDownloadStatus.fromECStatus(
                             tag.subtags.byte(ECTagName.EC_TAG_PARTFILE_STATUS)!!.getValue()
                                 .let { ECSearchFileDownloadStatus.fromValue(it) }
@@ -52,7 +52,7 @@ data class SearchResultsResponse(val files: List<SearchFile>) : Response {
     data class SearchFile(
         val fileName: String,
         val hash: ByteArray,
-        val sizeFull: Int,
+        val sizeFull: Long,
         // Possible download status of a file
         val downloadStatus: SearchFileDownloadStatus,
         // Returns the number of sources that have the entire file.

@@ -1,6 +1,7 @@
 package jamule
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import jamule.ec.packet.PacketParserTest
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -22,34 +23,43 @@ class AmuleClientTest : FunSpec({
             })
         .withExposedPorts(4712)
         .withLogConsumer(Slf4jLogConsumer(logger))
-    val amuleClient = AmuleClient(amule.host, 4712, logger = logger)
+//    val amuleClient = AmuleClient(amule.host, 4712, logger = logger)
+    val amuleClient = AmuleClient("192.168.86.163", 4712, logger = logger)
     amuleClient.authenticate("amule")
 
     test("should get server stats") {
-        amuleClient.getStats()
+        amuleClient.getStats().isSuccess shouldBe true
     }
 
     test("should search for a file") {
-        amuleClient.searchAsync("test")
+        amuleClient.searchAsync("test").isSuccess shouldBe true
     }
 
     test("should get search status") {
-        amuleClient.searchAsync("linux")
-        amuleClient.searchStatus()
+        amuleClient.searchAsync("linux").isSuccess shouldBe true
+        amuleClient.searchStatus().isSuccess shouldBe true
     }
 
     test("should get search results") {
-        amuleClient.searchSync("linux")
-        amuleClient.searchResults()
+        amuleClient.searchSync("linux").isSuccess shouldBe true
+        amuleClient.searchResults().isSuccess shouldBe true
     }
 
     test("should stop searches") {
-        amuleClient.searchAsync("linux")
-        amuleClient.searchStop()
+        amuleClient.searchAsync("linux").isSuccess shouldBe true
+        amuleClient.searchStop().isSuccess shouldBe true
     }
 
     test("should get download queue") {
-        amuleClient.getDownloadQueue()
+        val files = amuleClient.getDownloadQueue()
+        files.isSuccess shouldBe true
+        logger.info("Download queue: $files")
+    }
+
+    test("should get shared files list") {
+        val files = amuleClient.getSharedFiles()
+        files.isSuccess shouldBe true
+        logger.info("Shared files found ${files.getOrNull()!!.size}")
     }
 
 })

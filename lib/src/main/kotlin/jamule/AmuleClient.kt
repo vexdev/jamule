@@ -2,6 +2,7 @@ package jamule
 
 import jamule.auth.PasswordHasher
 import jamule.exception.CommunicationException
+import jamule.model.AmuleFile
 import jamule.model.AmuleTransferringFile
 import jamule.request.*
 import jamule.response.*
@@ -165,6 +166,17 @@ class AmuleClient(
         return when (val response = amuleConnection.sendRequest(DownloadQueueRequest())) {
             is DownloadQueueResponse -> Result.success(response.partFiles)
             else -> Result.failure(CommunicationException("Unable to get download queue"))
+        }
+    }
+
+    /**
+     * Returns the list of all files managed by amule.
+     */
+    fun getSharedFiles(): Result<List<AmuleFile>> {
+        logger.info("Getting shared files list...")
+        return when (val response = amuleConnection.sendRequest(SharedFilesRequest())) {
+            is SharedFilesResponse -> Result.success(response.sharedFiles)
+            else -> Result.failure(CommunicationException("Unable to get shared files list"))
         }
     }
 
