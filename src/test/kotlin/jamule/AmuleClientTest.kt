@@ -10,6 +10,7 @@ import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.output.Slf4jLogConsumer
 import org.testcontainers.images.builder.ImageFromDockerfile
 import org.testcontainers.images.builder.dockerfile.DockerfileBuilder
+import kotlin.math.roundToInt
 
 
 class AmuleClientTest : FunSpec({
@@ -63,7 +64,8 @@ class AmuleClientTest : FunSpec({
     }
 
     test("should create category") {
-        val category = AmuleCategory("test")
+        val category =
+            AmuleCategory((Math.random() * Int.MAX_VALUE).roundToInt(), "test", "/finished", "Some Comment", 1, 10)
         val result = amuleClient.createCategory(category)
         result.isSuccess shouldBe true
     }

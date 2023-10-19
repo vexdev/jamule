@@ -10,7 +10,7 @@ data class ErrorResponse(val serverMessage: String) : Exception(serverMessage), 
             packet.opCode == ECOpCode.EC_OP_FAILED
 
         override fun deserialize(packet: Packet) =
-            ErrorResponse(packet.string(ECTagName.EC_TAG_STRING)!!.getValue())
+            ErrorResponse(packet.string(ECTagName.EC_TAG_STRING)?.getValue() ?: "Unknown error")
 
     }
 }

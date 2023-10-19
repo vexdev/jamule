@@ -27,6 +27,7 @@ data class PrefsCategoriesResponse(val categories: List<AmuleCategory>) : Respon
                     comment = it.subtags.string(ECTagName.EC_TAG_CATEGORY_COMMENT)!!.getValue(),
                     priority = it.subtags.byte(ECTagName.EC_TAG_CATEGORY_PRIO)!!.getValue().toByte(),
                     color = it.subtags.numeric(ECTagName.EC_TAG_CATEGORY_COLOR)!!.getInt(),
+                    id = it.numeric()!!.getInt(),
                 )
             }
             .let { PrefsCategoriesResponse(it) }
