@@ -3,6 +3,7 @@ package jamule
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import jamule.ec.packet.PacketParserTest
+import jamule.model.AmuleCategory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.GenericContainer
@@ -23,8 +24,7 @@ class AmuleClientTest : FunSpec({
             })
         .withExposedPorts(4712)
         .withLogConsumer(Slf4jLogConsumer(logger))
-//    val amuleClient = AmuleClient(amule.host, 4712, logger = logger)
-    val amuleClient = AmuleClient("192.168.86.163", 4712, logger = logger)
+    val amuleClient = AmuleClient(amule.host, 4712, logger = logger)
     amuleClient.authenticate("amule")
 
     test("should get server stats") {
@@ -60,6 +60,17 @@ class AmuleClientTest : FunSpec({
         val files = amuleClient.getSharedFiles()
         files.isSuccess shouldBe true
         logger.info("Shared files found ${files.getOrNull()!!.size}")
+    }
+
+    test("should create category") {
+        val category = AmuleCategory("test")
+        val result = amuleClient.createCategory(category)
+        result.isSuccess shouldBe true
+    }
+
+    test("should get list of categories") {
+        val categories = amuleClient.getCategories().getOrThrow()
+        logger.info("Categories found ${categories.size}")
     }
 
 })

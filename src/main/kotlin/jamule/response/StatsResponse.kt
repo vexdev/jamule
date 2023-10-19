@@ -178,50 +178,52 @@ data class StatsResponse(
     val buddyPort: UShort?,
 
     ) : Response {
-    companion object {
-        @ResponseDeserializer(ECOpCode.EC_OP_STATS)
-        @JvmStatic
-        internal fun fromPacket(packet: Packet) = StatsResponse(
-            connectionState = packet.tags.firstOrNull { it.name == EC_TAG_CONNSTATE }
-                ?.let { ConnectionState.fromConStateTag(it) },
-            uploadOverhead = packet.numeric(EC_TAG_STATS_UP_OVERHEAD)?.getInt() ?: 0,
-            downloadOverhead = packet.numeric(EC_TAG_STATS_DOWN_OVERHEAD)?.getInt() ?: 0,
-            bannedCount = packet.numeric(EC_TAG_STATS_BANNED_COUNT)?.getInt() ?: 0,
-            loggerMessage = packet.tags.firstOrNull { it.name == EC_TAG_STATS_LOGGER_MESSAGE }
-                ?.subtags
-                ?.filter { it.name == EC_TAG_STRING }
-                ?.map { (it as StringTag).getValue() } ?: listOf(),
-            totalSentBytes = packet.numeric(EC_TAG_STATS_TOTAL_SENT_BYTES)?.getInt() ?: 0,
-            totalReceivedBytes = packet.numeric(EC_TAG_STATS_TOTAL_RECEIVED_BYTES)?.getInt() ?: 0,
-            sharedFileCount = packet.numeric(EC_TAG_STATS_SHARED_FILE_COUNT)?.getInt() ?: 0,
-            uploadSpeed = packet.numeric(EC_TAG_STATS_UL_SPEED)?.getInt() ?: 0,
-            downloadSpeed = packet.numeric(EC_TAG_STATS_DL_SPEED)?.getInt() ?: 0,
-            uploadSpeedLimit = packet.numeric(EC_TAG_STATS_UL_SPEED_LIMIT)?.getInt() ?: 0,
-            downloadSpeedLimit = packet.numeric(EC_TAG_STATS_DL_SPEED_LIMIT)?.getInt() ?: 0,
-            uploadQueueLength = packet.numeric(EC_TAG_STATS_UL_QUEUE_LEN)?.getInt() ?: 0,
-            totalSourceCount = packet.numeric(EC_TAG_STATS_TOTAL_SRC_COUNT)?.getInt() ?: 0,
-            ed2kUsers = packet.numeric(EC_TAG_STATS_ED2K_USERS)?.getInt() ?: 0,
-            kadUsers = packet.numeric(EC_TAG_STATS_KAD_USERS)?.getInt() ?: 0,
-            ed2kFiles = packet.numeric(EC_TAG_STATS_ED2K_FILES)?.getInt() ?: 0,
-            kadFiles = packet.numeric(EC_TAG_STATS_KAD_FILES)?.getInt() ?: 0,
-            kadNodes = packet.numeric(EC_TAG_STATS_KAD_NODES)?.getInt() ?: 0,
-            // Following metrics are only available if the client is connected to the Kad network.
-            kadFirewalledUdp = (packet.byte(EC_TAG_STATS_KAD_FIREWALLED_UDP)?.getValue()?.let { !it.equals(0u) }),
-            kadIndexedSources = packet.numeric(EC_TAG_STATS_KAD_INDEXED_SOURCES)?.getInt(),
-            kadIndexedKeywords = packet.numeric(EC_TAG_STATS_KAD_INDEXED_KEYWORDS)?.getInt(),
-            kadIndexedNotes = packet.numeric(EC_TAG_STATS_KAD_INDEXED_NOTES)?.getInt(),
-            kadIndexedLoad = packet.numeric(EC_TAG_STATS_KAD_INDEXED_LOAD)?.getInt(),
-            kadIpAddress = packet.int(EC_TAG_STATS_KAD_IP_ADRESS)?.getValue()
-                ?.let { ByteBuffer.allocate(4).putInt(it.toInt()).array() }
-                ?.let { InetAddress.getByAddress(it).hostAddress },
-            kadIsRunningInLanMode = packet.byte(EC_TAG_STATS_KAD_IN_LAN_MODE)?.getValue()?.let { !it.equals(0u) },
-            buddyStatus = packet.byte(EC_TAG_STATS_BUDDY_STATUS)?.getValue()
-                ?.let { BuddyState.fromByte(it) },
-            buddyIp = packet.int(EC_TAG_STATS_BUDDY_IP)?.getValue()
-                ?.let { ByteBuffer.allocate(4).putInt(it.toInt()).array() }
-                ?.let { InetAddress.getByAddress(it).hostAddress },
-            buddyPort = packet.short(EC_TAG_STATS_BUDDY_PORT)?.getValue()
-        )
+    internal object StatsResponseDeserializer : ResponseDeserializer() {
+        override fun canDeserialize(packet: Packet) =
+            packet.opCode == ECOpCode.EC_OP_STATS
+
+        override fun deserialize(packet: Packet) =
+            StatsResponse(
+                connectionState = packet.tags.firstOrNull { it.name == EC_TAG_CONNSTATE }
+                    ?.let { ConnectionState.fromConStateTag(it) },
+                uploadOverhead = packet.numeric(EC_TAG_STATS_UP_OVERHEAD)?.getInt() ?: 0,
+                downloadOverhead = packet.numeric(EC_TAG_STATS_DOWN_OVERHEAD)?.getInt() ?: 0,
+                bannedCount = packet.numeric(EC_TAG_STATS_BANNED_COUNT)?.getInt() ?: 0,
+                loggerMessage = packet.tags.firstOrNull { it.name == EC_TAG_STATS_LOGGER_MESSAGE }
+                    ?.subtags
+                    ?.filter { it.name == EC_TAG_STRING }
+                    ?.map { (it as StringTag).getValue() } ?: listOf(),
+                totalSentBytes = packet.numeric(EC_TAG_STATS_TOTAL_SENT_BYTES)?.getInt() ?: 0,
+                totalReceivedBytes = packet.numeric(EC_TAG_STATS_TOTAL_RECEIVED_BYTES)?.getInt() ?: 0,
+                sharedFileCount = packet.numeric(EC_TAG_STATS_SHARED_FILE_COUNT)?.getInt() ?: 0,
+                uploadSpeed = packet.numeric(EC_TAG_STATS_UL_SPEED)?.getInt() ?: 0,
+                downloadSpeed = packet.numeric(EC_TAG_STATS_DL_SPEED)?.getInt() ?: 0,
+                uploadSpeedLimit = packet.numeric(EC_TAG_STATS_UL_SPEED_LIMIT)?.getInt() ?: 0,
+                downloadSpeedLimit = packet.numeric(EC_TAG_STATS_DL_SPEED_LIMIT)?.getInt() ?: 0,
+                uploadQueueLength = packet.numeric(EC_TAG_STATS_UL_QUEUE_LEN)?.getInt() ?: 0,
+                totalSourceCount = packet.numeric(EC_TAG_STATS_TOTAL_SRC_COUNT)?.getInt() ?: 0,
+                ed2kUsers = packet.numeric(EC_TAG_STATS_ED2K_USERS)?.getInt() ?: 0,
+                kadUsers = packet.numeric(EC_TAG_STATS_KAD_USERS)?.getInt() ?: 0,
+                ed2kFiles = packet.numeric(EC_TAG_STATS_ED2K_FILES)?.getInt() ?: 0,
+                kadFiles = packet.numeric(EC_TAG_STATS_KAD_FILES)?.getInt() ?: 0,
+                kadNodes = packet.numeric(EC_TAG_STATS_KAD_NODES)?.getInt() ?: 0,
+                // Following metrics are only available if the client is connected to the Kad network.
+                kadFirewalledUdp = (packet.byte(EC_TAG_STATS_KAD_FIREWALLED_UDP)?.getValue()?.let { !it.equals(0u) }),
+                kadIndexedSources = packet.numeric(EC_TAG_STATS_KAD_INDEXED_SOURCES)?.getInt(),
+                kadIndexedKeywords = packet.numeric(EC_TAG_STATS_KAD_INDEXED_KEYWORDS)?.getInt(),
+                kadIndexedNotes = packet.numeric(EC_TAG_STATS_KAD_INDEXED_NOTES)?.getInt(),
+                kadIndexedLoad = packet.numeric(EC_TAG_STATS_KAD_INDEXED_LOAD)?.getInt(),
+                kadIpAddress = packet.int(EC_TAG_STATS_KAD_IP_ADRESS)?.getValue()
+                    ?.let { ByteBuffer.allocate(4).putInt(it.toInt()).array() }
+                    ?.let { InetAddress.getByAddress(it).hostAddress },
+                kadIsRunningInLanMode = packet.byte(EC_TAG_STATS_KAD_IN_LAN_MODE)?.getValue()?.let { !it.equals(0u) },
+                buddyStatus = packet.byte(EC_TAG_STATS_BUDDY_STATUS)?.getValue()
+                    ?.let { BuddyState.fromByte(it) },
+                buddyIp = packet.int(EC_TAG_STATS_BUDDY_IP)?.getValue()
+                    ?.let { ByteBuffer.allocate(4).putInt(it.toInt()).array() }
+                    ?.let { InetAddress.getByAddress(it).hostAddress },
+                buddyPort = packet.short(EC_TAG_STATS_BUDDY_PORT)?.getValue()
+            )
     }
 
     enum class BuddyState(val value: UByte) {

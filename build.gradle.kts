@@ -15,8 +15,6 @@ repositories {
 dependencies {
     implementation("com.google.guava:guava:32.1.1-jre")
     implementation("org.slf4j:slf4j-api:2.0.9")
-    implementation(kotlin("reflect"))
-    implementation("org.reflections:reflections:0.10.2")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -57,7 +55,7 @@ tasks.withType<ProcessResources> {
 }
 
 group = "com.vexdev"
-version = "0.1.0"
+version = "0.2.0"
 
 signing {
     val signingKey = providers

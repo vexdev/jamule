@@ -1,7 +1,9 @@
 package jamule
 
 import jamule.auth.PasswordHasher
+import jamule.ec.EcPrefs
 import jamule.exception.CommunicationException
+import jamule.model.AmuleCategory
 import jamule.model.AmuleFile
 import jamule.model.AmuleTransferringFile
 import jamule.request.*
@@ -177,6 +179,30 @@ class AmuleClient(
         return when (val response = amuleConnection.sendRequest(SharedFilesRequest())) {
             is SharedFilesResponse -> Result.success(response.sharedFiles)
             else -> Result.failure(CommunicationException("Unable to get shared files list"))
+        }
+    }
+
+    /**
+     * Creates a category in amule.
+     */
+    fun createCategory(category: AmuleCategory): Result<Unit> {
+        logger.info("Creating a category: $category")
+        return when (val response = amuleConnection.sendRequest(CreateCategoryRequest(category))) {
+            is NoopResponse -> Result.success(Unit)
+            is ErrorResponse -> Result.failure(response)
+            else -> Result.failure(CommunicationException("Unable to create category"))
+        }
+    }
+
+    /**
+     * Returns the list of all categories in amule.
+     */
+    fun getCategories(): Result<List<AmuleCategory>> {
+        logger.info("Getting categories...")
+        return when (val response = amuleConnection.sendRequest(GetPreferencesRequest(EcPrefs.EC_PREFS_CATEGORIES))) {
+            is PrefsCategoriesResponse -> Result.success(response.categories)
+            is EmptyPreferencesResponse -> Result.success(emptyList())
+            else -> Result.failure(CommunicationException("Unable to get categories"))
         }
     }
 

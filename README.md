@@ -7,7 +7,7 @@ Note: this library is compatible for Amule 2.3.1 to 2.3.3
 This library can be imported through maven like this:
 (Please check the latest version as tagged)
 ```gradle
-implementation("com.vexdev:jamule:0.1.0")
+implementation("com.vexdev:jamule:<LATEST_VERSION_HERE>")
 ```
 
 ## Releasing

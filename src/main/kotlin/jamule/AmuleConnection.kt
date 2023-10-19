@@ -14,7 +14,7 @@ import java.net.Socket
 
 internal class AmuleConnection(
     private val socket: Socket,
-    private val logger: Logger
+    logger: Logger
 ) : AutoCloseable by socket {
     @OptIn(ExperimentalUnsignedTypes::class)
     private val tagParser = TagParser(logger)

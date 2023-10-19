@@ -1,4 +1,3 @@
 package jamule.response
 
-sealed interface Response
-
+internal sealed interface Response

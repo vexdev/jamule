@@ -11,31 +11,31 @@ import jamule.ec.packet.Packet.Companion.string
 import jamule.exception.CommunicationException
 
 data class SearchResultsResponse(val files: List<SearchFile>) : Response {
+    internal object SearchResultsResponseDeserializer : ResponseDeserializer() {
+        override fun canDeserialize(packet: Packet) =
+            packet.opCode == ECOpCode.EC_OP_SEARCH_RESULTS
 
-    companion object {
-        @OptIn(ExperimentalUnsignedTypes::class)
-        @ResponseDeserializer(ECOpCode.EC_OP_SEARCH_RESULTS)
-        @JvmStatic
-        internal fun fromPacket(packet: Packet) = SearchResultsResponse(
-            packet.tags.map { tag ->
-                if (tag.name == ECTagName.EC_TAG_SEARCHFILE) {
-                    SearchFile(
-                        fileName = tag.subtags.string(ECTagName.EC_TAG_PARTFILE_NAME)!!.getValue(),
-                        hash = tag.subtags.hash16(ECTagName.EC_TAG_PARTFILE_HASH)!!.getValue().toByteArray(),
-                        sizeFull = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SIZE_FULL)?.getLong() ?: 0,
-                        downloadStatus = SearchFileDownloadStatus.fromECStatus(
-                            tag.subtags.byte(ECTagName.EC_TAG_PARTFILE_STATUS)!!.getValue()
-                                .let { ECSearchFileDownloadStatus.fromValue(it) }
-                        ),
-                        completeSourceCount = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SOURCE_COUNT_XFER)
-                            ?.getInt() ?: 0,
-                        sourceCount = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SOURCE_COUNT)?.getInt() ?: 0,
-                    )
-                } else {
-                    throw CommunicationException("Unexpected tag ${tag.name} in SearchResultsResponse")
+        override fun deserialize(packet: Packet) =
+            SearchResultsResponse(
+                packet.tags.map { tag ->
+                    if (tag.name == ECTagName.EC_TAG_SEARCHFILE) {
+                        SearchFile(
+                            fileName = tag.subtags.string(ECTagName.EC_TAG_PARTFILE_NAME)!!.getValue(),
+                            hash = tag.subtags.hash16(ECTagName.EC_TAG_PARTFILE_HASH)!!.getValue().toByteArray(),
+                            sizeFull = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SIZE_FULL)?.getLong() ?: 0,
+                            downloadStatus = SearchFileDownloadStatus.fromECStatus(
+                                tag.subtags.byte(ECTagName.EC_TAG_PARTFILE_STATUS)!!.getValue()
+                                    .let { ECSearchFileDownloadStatus.fromValue(it) }
+                            ),
+                            completeSourceCount = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SOURCE_COUNT_XFER)
+                                ?.getInt() ?: 0,
+                            sourceCount = tag.subtags.numeric(ECTagName.EC_TAG_PARTFILE_SOURCE_COUNT)?.getInt() ?: 0,
+                        )
+                    } else {
+                        throw CommunicationException("Unexpected tag ${tag.name} in SearchResultsResponse")
+                    }
                 }
-            }
-        )
+            )
 
     }
 

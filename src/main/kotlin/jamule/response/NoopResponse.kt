@@ -3,10 +3,12 @@ package jamule.response
 import jamule.ec.ECOpCode
 import jamule.ec.packet.Packet
 
-class NoopResponse : Response {
-    companion object {
-        @ResponseDeserializer(ECOpCode.EC_OP_NOOP)
-        @JvmStatic
-        internal fun fromPacket(packet: Packet) = NoopResponse()
+data object NoopResponse : Response {
+    internal object NoopResponseDeserializer : ResponseDeserializer() {
+        override fun canDeserialize(packet: Packet) =
+            packet.opCode == ECOpCode.EC_OP_NOOP
+
+        override fun deserialize(packet: Packet) =
+            NoopResponse
     }
 }
