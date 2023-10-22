@@ -3,7 +3,6 @@ package jamule.ec.tag.special
 import jamule.ec.ECTagName.*
 import jamule.ec.packet.Packet.Companion.byte
 import jamule.ec.packet.Packet.Companion.numeric
-import jamule.ec.packet.Packet.Companion.string
 import jamule.ec.tag.Tag
 import jamule.model.AmuleFile
 import jamule.model.AmuleTransferringFile
@@ -22,7 +21,7 @@ internal data class PartFileTag(
     override val sourceCountA4AF: Short, // EC_TAG_PARTFILE_SOURCE_COUNT_A4AF
     override val speed: Long?, //? EC_TAG_PARTFILE_SPEED.getInt(),
     override val downPrio: Byte, // EC_TAG_PARTFILE_PRIO
-    override val fileCat: Byte, // EC_TAG_PARTFILE_CAT
+    override val fileCat: Long, // EC_TAG_PARTFILE_CAT
     override val lastSeenComplete: Long, // EC_TAG_PARTFILE_LAST_SEEN_COMP
     override val lastDateChanged: Long, // EC_TAG_PARTFILE_LAST_RECV
     override val downloadActiveTime: Int, // EC_TAG_PARTFILE_DOWNLOAD_ACTIVE
@@ -53,7 +52,7 @@ internal data class PartFileTag(
             sourceCountA4AF = subtags.numeric(EC_TAG_PARTFILE_SOURCE_COUNT_A4AF)!!.getShort(),
             speed = subtags.numeric(EC_TAG_PARTFILE_SPEED)?.getLong(),
             downPrio = subtags.byte(EC_TAG_PARTFILE_PRIO)!!.getValue().toByte(),
-            fileCat = subtags.byte(EC_TAG_PARTFILE_CAT)!!.getValue().toByte(),
+            fileCat = subtags.numeric(EC_TAG_PARTFILE_CAT)!!.getLong(),
             lastSeenComplete = subtags.numeric(EC_TAG_PARTFILE_LAST_SEEN_COMP)!!.getLong(),
             lastDateChanged = subtags.numeric(EC_TAG_PARTFILE_LAST_RECV)!!.getLong(),
             downloadActiveTime = subtags.numeric(EC_TAG_PARTFILE_DOWNLOAD_ACTIVE)!!.getInt(),

@@ -206,6 +206,29 @@ class AmuleClient(
         }
     }
 
+    /**
+     * Sets the category of a file.
+     */
+    @OptIn(ExperimentalStdlibApi::class)
+    fun setFileCategory(hash: ByteArray, categoryId: Long): Result<Unit> {
+        logger.info("Setting file category...")
+        // Check that the file is being downloaded
+        return runCatching {
+            val downloadQueue = getDownloadQueue().getOrThrow()
+            val file = downloadQueue.firstOrNull { it.fileHashHexString == hash.toHexString() }
+            if (file == null) {
+                logger.warn("File $hash not found in download queue")
+                throw CommunicationException("File $hash not found in download queue")
+            }
+            when (val response = amuleConnection.sendRequest(SetFileCategoryRequest(hash, categoryId))) {
+                is NoopResponse -> Unit
+                is ErrorResponse -> throw response
+                else -> throw CommunicationException("Unable to set file category")
+            }
+        }
+
+    }
+
     companion object {
         const val CLIENT_NAME = "jAmule"
     }

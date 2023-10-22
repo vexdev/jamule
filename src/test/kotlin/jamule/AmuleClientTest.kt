@@ -11,8 +11,10 @@ import org.testcontainers.containers.output.Slf4jLogConsumer
 import org.testcontainers.images.builder.ImageFromDockerfile
 import org.testcontainers.images.builder.dockerfile.DockerfileBuilder
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 
+@OptIn(ExperimentalStdlibApi::class)
 class AmuleClientTest : FunSpec({
     val logger: Logger = LoggerFactory.getLogger(PacketParserTest::class.java)
     val amule = GenericContainer(
@@ -65,7 +67,7 @@ class AmuleClientTest : FunSpec({
 
     test("should create category") {
         val category =
-            AmuleCategory((Math.random() * Int.MAX_VALUE).roundToInt(), "test", "/finished", "Some Comment", 1, 10)
+            AmuleCategory((Math.random() * Int.MAX_VALUE).roundToLong(), "test", "/finished", "Some Comment", 1, 10)
         val result = amuleClient.createCategory(category)
         result.isSuccess shouldBe true
     }

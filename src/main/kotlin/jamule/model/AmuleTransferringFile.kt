@@ -12,7 +12,7 @@ interface AmuleTransferringFile : AmuleFile {
     val sourceCountA4AF: Short
     val speed: Long?
     val downPrio: Byte
-    val fileCat: Byte
+    val fileCat: Long
     val lastSeenComplete: Long
     val lastDateChanged: Long
     val downloadActiveTime: Int

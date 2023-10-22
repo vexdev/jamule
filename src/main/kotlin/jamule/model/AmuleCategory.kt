@@ -1,7 +1,7 @@
 package jamule.model
 
 data class AmuleCategory(
-    val id: Int,
+    val id: Long,
     val name: String,
     val path: String = "",
     val comment: String = "",
