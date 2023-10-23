@@ -55,7 +55,7 @@ tasks.withType<ProcessResources> {
 }
 
 group = "com.vexdev"
-version = "0.4.0"
+version = "0.4.1"
 
 signing {
     val signingKey = providers
