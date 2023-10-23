@@ -17,7 +17,7 @@ internal class SaltRequest : Request {
         ECOpCode.EC_OP_AUTH_REQ,
         listOf(
             StringTag(ECTagName.EC_TAG_CLIENT_NAME, AmuleClient.CLIENT_NAME),
-            StringTag(ECTagName.EC_TAG_CLIENT_VERSION, Build.version),
+            StringTag(ECTagName.EC_TAG_CLIENT_VERSION, Build.VERSION),
             UShortTag(ECTagName.EC_TAG_PROTOCOL_VERSION, ProtocolVersion.EC_CURRENT_PROTOCOL_VERSION.value),
             CustomTag(ECTagName.EC_TAG_CAN_ZLIB, UByteArray(0)),
             CustomTag(ECTagName.EC_TAG_CAN_UTF8_NUMBERS, UByteArray(0)),

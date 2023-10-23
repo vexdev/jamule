@@ -1,5 +1,3 @@
-import java.util.*
-
 plugins {
     signing
     `maven-publish`
@@ -41,21 +39,8 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
-tasks.withType<ProcessResources> {
-    doLast {
-        val propertiesFile = file("$buildDir/resources/main/build.properties")
-        val propertiesFileTest = file("$buildDir/resources/test/build.properties")
-        propertiesFile.parentFile.mkdirs()
-        propertiesFileTest.parentFile.mkdirs()
-        val properties = Properties()
-        properties.setProperty("version", rootProject.version.toString())
-        propertiesFile.writer().use { properties.store(it, null) }
-        propertiesFileTest.writer().use { properties.store(it, null) }
-    }
-}
-
 group = "com.vexdev"
-version = "0.4.1"
+version = "0.4.2"
 
 signing {
     val signingKey = providers

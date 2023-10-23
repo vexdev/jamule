@@ -11,7 +11,6 @@ import jamule.request.*
 import jamule.response.*
 import org.slf4j.Logger
 import org.slf4j.helpers.NOPLogger
-import java.net.InetAddress
 import java.net.Socket
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -22,7 +21,7 @@ class AmuleClient(
     private val timeout: Int = 0,
     private val logger: Logger = NOPLogger.NOP_LOGGER
 ) : AutoCloseable {
-    private val socket: Socket = Socket(InetAddress.getByName(host), port).apply { soTimeout = timeout }
+    private val socket: Socket = Socket(host, port).apply { soTimeout = timeout }
     private val amuleConnection = AmuleConnection(socket, logger)
 
     override fun close() = amuleConnection.close()
