@@ -6,6 +6,7 @@ import jamule.exception.CommunicationException
 import jamule.model.AmuleCategory
 import jamule.model.AmuleFile
 import jamule.model.AmuleTransferringFile
+import jamule.model.DownloadCommand
 import jamule.request.*
 import jamule.response.*
 import org.slf4j.Logger
@@ -228,7 +229,18 @@ class AmuleClient(
                 else -> throw CommunicationException("Unable to set file category")
             }
         }
+    }
 
+    /**
+     * Sends a download command to a file, such as pause, resume, etc.
+     */
+    fun sendDownloadCommand(hash: ByteArray, command: DownloadCommand): Result<Unit> {
+        logger.info("Sending download command...")
+        return when (val response = amuleConnection.sendRequest(DownloadCommandRequest(hash, command))) {
+            is NoopResponse -> Result.success(Unit)
+            is ErrorResponse -> Result.failure(response)
+            else -> Result.failure(CommunicationException("Unable to send download command"))
+        }
     }
 
     companion object {

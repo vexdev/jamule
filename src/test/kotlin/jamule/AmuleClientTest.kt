@@ -4,13 +4,13 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import jamule.ec.packet.PacketParserTest
 import jamule.model.AmuleCategory
+import jamule.model.DownloadCommand
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.output.Slf4jLogConsumer
 import org.testcontainers.images.builder.ImageFromDockerfile
 import org.testcontainers.images.builder.dockerfile.DockerfileBuilder
-import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 
@@ -75,6 +75,13 @@ class AmuleClientTest : FunSpec({
     test("should get list of categories") {
         val categories = amuleClient.getCategories().getOrThrow()
         logger.info("Categories found ${categories.size}")
+    }
+
+    test("should download then pause then delete") {
+        val toDownload = amuleClient.searchSync("linux").getOrThrow().files.first()
+        amuleClient.downloadSearchResult(toDownload.hash).getOrThrow()
+        amuleClient.sendDownloadCommand(toDownload.hash, DownloadCommand.PAUSE).getOrThrow()
+        amuleClient.sendDownloadCommand(toDownload.hash, DownloadCommand.DELETE).getOrThrow()
     }
 
 })

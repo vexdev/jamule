@@ -10,7 +10,7 @@ data class StringsResponse(val string: String) : Response {
             packet.opCode == ECOpCode.EC_OP_STRINGS
 
         override fun deserialize(packet: Packet) =
-            StringsResponse(packet.string(ECTagName.EC_TAG_STRING)!!.getValue())
+            StringsResponse(packet.string(ECTagName.EC_TAG_STRING)?.getValue() ?: "")
 
     }
 }
