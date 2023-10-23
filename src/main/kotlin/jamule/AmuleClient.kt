@@ -118,7 +118,9 @@ class AmuleClient(
         val start = System.currentTimeMillis()
         while (searchStatus().getOrElse { return Result.failure(it) } < 1f) {
             if (System.currentTimeMillis() - start > timeout.inWholeMilliseconds) {
-                throw CommunicationException("Search timed out")
+                logger.error("Search timed out")
+                break
+                // Let's not return an error here, as the search might have finished
             }
             Thread.sleep(100)
         }
