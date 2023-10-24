@@ -220,8 +220,8 @@ class AmuleClient(
             val downloadQueue = getDownloadQueue().getOrThrow()
             val file = downloadQueue.firstOrNull { it.fileHashHexString == hash.toHexString() }
             if (file == null) {
-                logger.warn("File $hash not found in download queue")
-                throw CommunicationException("File $hash not found in download queue")
+                logger.warn("File ${hash.toHexString()} not found in download queue")
+                throw CommunicationException("File ${hash.toHexString()} not found in download queue")
             }
             when (val response = amuleConnection.sendRequest(SetFileCategoryRequest(hash, categoryId))) {
                 is NoopResponse -> Unit

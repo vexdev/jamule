@@ -40,7 +40,7 @@ tasks.named<Test>("test") {
 }
 
 group = "com.vexdev"
-version = "0.4.2"
+version = "0.4.3"
 
 signing {
     val signingKey = providers
