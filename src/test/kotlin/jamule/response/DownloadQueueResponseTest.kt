@@ -73,7 +73,7 @@ class DownloadQueueResponseTest : FunSpec({
 
     test("parses response") {
         val packet = parser.parse(ByteArrayInputStream(response))
-        val queue = DownloadQueueResponse.fromPacket(packet)
+        val queue = DownloadQueueResponse.DownloadQueueResponseDeserializer.deserialize(packet)
 
         queue shouldBe DownloadQueueResponse(
             listOf(

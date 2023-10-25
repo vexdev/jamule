@@ -1,6 +1,5 @@
 package jamule
 
-import jamule.auth.PasswordHasher
 import jamule.ec.EcPrefs
 import jamule.exception.CommunicationException
 import jamule.model.AmuleCategory
@@ -11,42 +10,22 @@ import jamule.request.*
 import jamule.response.*
 import org.slf4j.Logger
 import org.slf4j.helpers.NOPLogger
-import java.net.Socket
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class AmuleClient(
     host: String,
     port: Int,
-    private val timeout: Int = 0,
+    password: String,
+    timeout: Int = 0,
     private val logger: Logger = NOPLogger.NOP_LOGGER
-) : AutoCloseable {
-    private val socket: Socket = Socket(host, port).apply { soTimeout = timeout }
-    private val amuleConnection = AmuleConnection(socket, logger)
-
-    override fun close() = amuleConnection.close()
+) {
+    private val amuleConnection = AmuleConnection(host, port, timeout, password, logger)
 
     /**
-     * Authenticates with the server, returning the server version.
+     * Sets up a new connection to the server.
      */
-    @OptIn(ExperimentalUnsignedTypes::class)
-    fun authenticate(password: String): Result<String> {
-        logger.info("Authenticating...")
-        val saltResponse = amuleConnection.sendRequest(SaltRequest())
-        when (saltResponse) {
-            is AuthFailedResponse -> return Result.failure(saltResponse)
-            !is AuthSaltResponse -> return Result.failure(CommunicationException("Unable to get auth salt"))
-            else -> Unit
-        }
-        val saltedPassword = PasswordHasher.hash(password, saltResponse.salt)
-        return when (val response = amuleConnection.sendRequest(AuthRequest(saltedPassword))) {
-            is AuthOkResponse -> Result.success(response.version)
-                .also { logger.info("Authenticated with server version ${response.version}") }
-
-            is AuthFailedResponse -> Result.failure(response)
-            else -> Result.failure(CommunicationException("Unable to authenticate"))
-        }
-    }
+    fun reconnect() = amuleConnection.reconnect()
 
     /**
      * Queries the server for statistics.

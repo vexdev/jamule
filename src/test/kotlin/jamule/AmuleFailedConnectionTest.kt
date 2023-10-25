@@ -1,5 +1,6 @@
 package jamule
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -21,11 +22,11 @@ class AmuleFailedConnectionTest : FunSpec({
                     .build()
             })
         .withExposedPorts(4712)
-    val amuleClient = AmuleClient(amule.host, 4712, logger = logger)
+    val amuleClient = AmuleClient(amule.host, 4712, "invalid", logger = logger)
 
     test("authenticate should fail") {
-        val exception = amuleClient.authenticate("invalid").exceptionOrNull()
+        val exception = shouldThrow<Exception> { amuleClient.reconnect() }
         exception shouldNotBe null
-        exception!!.message shouldBe "Authentication failed: wrong password."
+        exception.message shouldBe "Authentication failed: wrong password."
     }
 })

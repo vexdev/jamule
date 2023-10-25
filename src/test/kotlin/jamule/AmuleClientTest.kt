@@ -14,7 +14,6 @@ import org.testcontainers.images.builder.dockerfile.DockerfileBuilder
 import kotlin.math.roundToLong
 
 
-@OptIn(ExperimentalStdlibApi::class)
 class AmuleClientTest : FunSpec({
     val logger: Logger = LoggerFactory.getLogger(PacketParserTest::class.java)
     val amule = GenericContainer(
@@ -27,8 +26,7 @@ class AmuleClientTest : FunSpec({
             })
         .withExposedPorts(4712)
         .withLogConsumer(Slf4jLogConsumer(logger))
-    val amuleClient = AmuleClient(amule.host, 4712, logger = logger)
-    amuleClient.authenticate("amule")
+    val amuleClient = AmuleClient(amule.host, 4712, "amule", logger = logger)
 
     test("should get server stats") {
         amuleClient.getStats().isSuccess shouldBe true

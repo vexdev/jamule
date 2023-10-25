@@ -1,21 +1,30 @@
 package jamule
 
+import jamule.auth.PasswordHasher
 import jamule.ec.packet.PacketParser
 import jamule.ec.packet.PacketWriter
 import jamule.ec.tag.TagEncoder
 import jamule.ec.tag.TagParser
+import jamule.exception.CommunicationException
 import jamule.exception.ServerException
+import jamule.request.AuthRequest
 import jamule.request.Request
-import jamule.response.ErrorResponse
-import jamule.response.Response
-import jamule.response.ResponseParser
+import jamule.request.SaltRequest
+import jamule.response.*
 import org.slf4j.Logger
+import java.io.IOException
 import java.net.Socket
 
 internal class AmuleConnection(
-    private val socket: Socket,
-    logger: Logger
-) : AutoCloseable by socket {
+    private val host: String,
+    private val port: Int,
+    private val timeout: Int,
+    private val password: String,
+    private val logger: Logger
+) {
+    private var socket = Socket(host, port).apply { soTimeout = timeout }
+    private var connected = false
+
     @OptIn(ExperimentalUnsignedTypes::class)
     private val tagParser = TagParser(logger)
 
@@ -28,8 +37,28 @@ internal class AmuleConnection(
     @OptIn(ExperimentalUnsignedTypes::class)
     private val packetWriter = PacketWriter(tagEncoder, logger)
 
-    @OptIn(ExperimentalUnsignedTypes::class)
+    fun reconnect() {
+        synchronized(socket) {
+            logger.info("Reconnecting...")
+            connected = false
+            runCatching { socket.close() }
+            socket = Socket(host, port).apply { soTimeout = timeout }
+            authenticate()
+        }
+    }
+
     fun sendRequest(request: Request): Response {
+        if (!connected) reconnect()
+        try {
+            return sendRequestNoAuth(request)
+        } catch (e: IOException) {
+            connected = false
+            throw e
+        }
+    }
+
+    @OptIn(ExperimentalUnsignedTypes::class)
+    fun sendRequestNoAuth(request: Request): Response {
         val outputStream = socket.getOutputStream()
         val inputStream = socket.getInputStream().buffered()
         val packet = request.packet()
@@ -40,5 +69,23 @@ internal class AmuleConnection(
                 throw ServerException(it.serverMessage)
             }
         }
+    }
+
+    @OptIn(ExperimentalUnsignedTypes::class)
+    private fun authenticate() {
+        logger.info("Authenticating...")
+        val saltResponse = sendRequestNoAuth(SaltRequest())
+        if (saltResponse is AuthFailedResponse)
+            throw ServerException("Authentication failed", saltResponse)
+        else if (saltResponse !is AuthSaltResponse)
+            throw CommunicationException("Unable to get auth salt")
+        val saltedPassword = PasswordHasher.hash(password, saltResponse.salt)
+        val response = sendRequestNoAuth(AuthRequest(saltedPassword))
+        if (response is AuthFailedResponse)
+            throw ServerException("Authentication failed", response)
+        else if (response !is AuthOkResponse)
+            throw CommunicationException("Unable to authenticate")
+        logger.info("Authenticated with server version ${response.version}")
+        connected = true
     }
 }
