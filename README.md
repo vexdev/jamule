@@ -1,6 +1,8 @@
-# jAmule - Amule client for Java
+# jaMule - aMule client for Java
+![Maven Central](https://img.shields.io/maven-central/v/com.vexdev/jamule)
 
-Note: this library is compatible for Amule 2.3.1 to 2.3.3
+
+Note: this library is compatible for aMule 2.3.1 to 2.3.3
 
 ## Usage
 

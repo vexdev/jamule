@@ -24,18 +24,18 @@ data class StatsResponse(
      * The overhead is the amount of data that is sent in addition to the actual data.
      * This metric returns it as bytes per second.
      */
-    val uploadOverhead: Int,
+    val uploadOverhead: Long,
 
     /**
      * The overhead is the amount of data that is sent in addition to the actual data.
      * This metric returns it as bytes per second.
      */
-    val downloadOverhead: Int,
+    val downloadOverhead: Long,
 
     /**
      * The number of banned clients.
      */
-    val bannedCount: Int,
+    val bannedCount: Long,
 
     /**
      * Up to 200 lines of log messages.
@@ -45,72 +45,72 @@ data class StatsResponse(
     /**
      * The total number of bytes sent.
      */
-    val totalSentBytes: Int,
+    val totalSentBytes: Long,
 
     /**
      * The total number of bytes received.
      */
-    val totalReceivedBytes: Int,
+    val totalReceivedBytes: Long,
 
     /**
      * The total number of shared files.
      */
-    val sharedFileCount: Int,
+    val sharedFileCount: Long,
 
     /**
      * The upload speed in bytes per second.
      */
-    val uploadSpeed: Int,
+    val uploadSpeed: Long,
 
     /**
      * The download speed in bytes per second.
      */
-    val downloadSpeed: Int,
+    val downloadSpeed: Long,
 
     /**
      * The upload speed limit in bytes per second.
      */
-    val uploadSpeedLimit: Int,
+    val uploadSpeedLimit: Long,
 
     /**
      * The download speed limit in bytes per second.
      */
-    val downloadSpeedLimit: Int,
+    val downloadSpeedLimit: Long,
 
     /**
      * The number of users in the upload queue.
      */
-    val uploadQueueLength: Int,
+    val uploadQueueLength: Long,
 
     /**
      * The total number of sources found.
      */
-    val totalSourceCount: Int,
+    val totalSourceCount: Long,
 
     /**
      * The number of users connected to the eD2K network.
      */
-    val ed2kUsers: Int,
+    val ed2kUsers: Long,
 
     /**
      * The number of users connected to the Kad network.
      */
-    val kadUsers: Int,
+    val kadUsers: Long,
 
     /**
      * The number of files shared on the eD2K network.
      */
-    val ed2kFiles: Int,
+    val ed2kFiles: Long,
 
     /**
      * The number of files shared on the Kad network.
      */
-    val kadFiles: Int,
+    val kadFiles: Long,
 
     /**
      * The number of nodes in the Kad network.
      */
-    val kadNodes: Int,
+    val kadNodes: Long,
 
     //// Following metrics are only available if the client is connected to the Kad network.
 
@@ -124,25 +124,25 @@ data class StatsResponse(
      * The number of sources indexed on the Kad network.
      * Only available if the client is connected to the Kad network.
      */
-    val kadIndexedSources: Int?,
+    val kadIndexedSources: Long?,
 
     /**
      * The number of keywords indexed on the Kad network.
      * Only available if the client is connected to the Kad network.
      */
-    val kadIndexedKeywords: Int?,
+    val kadIndexedKeywords: Long?,
 
     /**
      * The number of notes indexed on the Kad network.
      * Only available if the client is connected to the Kad network.
      */
-    val kadIndexedNotes: Int?,
+    val kadIndexedNotes: Long?,
 
     /**
      * The total indexed load of the Kad network.
      * Only available if the client is connected to the Kad network.
      */
-    val kadIndexedLoad: Int?,
+    val kadIndexedLoad: Long?,
 
     /**
      * The client's IP address in the Kad network.
@@ -186,33 +186,33 @@ data class StatsResponse(
             StatsResponse(
                 connectionState = packet.tags.firstOrNull { it.name == EC_TAG_CONNSTATE }
                     ?.let { ConnectionState.fromConStateTag(it) },
-                uploadOverhead = packet.numeric(EC_TAG_STATS_UP_OVERHEAD)?.getInt() ?: 0,
-                downloadOverhead = packet.numeric(EC_TAG_STATS_DOWN_OVERHEAD)?.getInt() ?: 0,
-                bannedCount = packet.numeric(EC_TAG_STATS_BANNED_COUNT)?.getInt() ?: 0,
+                uploadOverhead = packet.numeric(EC_TAG_STATS_UP_OVERHEAD)?.getLong() ?: 0,
+                downloadOverhead = packet.numeric(EC_TAG_STATS_DOWN_OVERHEAD)?.getLong() ?: 0,
+                bannedCount = packet.numeric(EC_TAG_STATS_BANNED_COUNT)?.getLong() ?: 0,
                 loggerMessage = packet.tags.firstOrNull { it.name == EC_TAG_STATS_LOGGER_MESSAGE }
                     ?.subtags
                     ?.filter { it.name == EC_TAG_STRING }
                     ?.map { (it as StringTag).getValue() } ?: listOf(),
-                totalSentBytes = packet.numeric(EC_TAG_STATS_TOTAL_SENT_BYTES)?.getInt() ?: 0,
-                totalReceivedBytes = packet.numeric(EC_TAG_STATS_TOTAL_RECEIVED_BYTES)?.getInt() ?: 0,
-                sharedFileCount = packet.numeric(EC_TAG_STATS_SHARED_FILE_COUNT)?.getInt() ?: 0,
-                uploadSpeed = packet.numeric(EC_TAG_STATS_UL_SPEED)?.getInt() ?: 0,
-                downloadSpeed = packet.numeric(EC_TAG_STATS_DL_SPEED)?.getInt() ?: 0,
-                uploadSpeedLimit = packet.numeric(EC_TAG_STATS_UL_SPEED_LIMIT)?.getInt() ?: 0,
-                downloadSpeedLimit = packet.numeric(EC_TAG_STATS_DL_SPEED_LIMIT)?.getInt() ?: 0,
-                uploadQueueLength = packet.numeric(EC_TAG_STATS_UL_QUEUE_LEN)?.getInt() ?: 0,
-                totalSourceCount = packet.numeric(EC_TAG_STATS_TOTAL_SRC_COUNT)?.getInt() ?: 0,
-                ed2kUsers = packet.numeric(EC_TAG_STATS_ED2K_USERS)?.getInt() ?: 0,
-                kadUsers = packet.numeric(EC_TAG_STATS_KAD_USERS)?.getInt() ?: 0,
-                ed2kFiles = packet.numeric(EC_TAG_STATS_ED2K_FILES)?.getInt() ?: 0,
-                kadFiles = packet.numeric(EC_TAG_STATS_KAD_FILES)?.getInt() ?: 0,
-                kadNodes = packet.numeric(EC_TAG_STATS_KAD_NODES)?.getInt() ?: 0,
+                totalSentBytes = packet.numeric(EC_TAG_STATS_TOTAL_SENT_BYTES)?.getLong() ?: 0,
+                totalReceivedBytes = packet.numeric(EC_TAG_STATS_TOTAL_RECEIVED_BYTES)?.getLong() ?: 0,
+                sharedFileCount = packet.numeric(EC_TAG_STATS_SHARED_FILE_COUNT)?.getLong() ?: 0,
+                uploadSpeed = packet.numeric(EC_TAG_STATS_UL_SPEED)?.getLong() ?: 0,
+                downloadSpeed = packet.numeric(EC_TAG_STATS_DL_SPEED)?.getLong() ?: 0,
+                uploadSpeedLimit = packet.numeric(EC_TAG_STATS_UL_SPEED_LIMIT)?.getLong() ?: 0,
+                downloadSpeedLimit = packet.numeric(EC_TAG_STATS_DL_SPEED_LIMIT)?.getLong() ?: 0,
+                uploadQueueLength = packet.numeric(EC_TAG_STATS_UL_QUEUE_LEN)?.getLong() ?: 0,
+                totalSourceCount = packet.numeric(EC_TAG_STATS_TOTAL_SRC_COUNT)?.getLong() ?: 0,
+                ed2kUsers = packet.numeric(EC_TAG_STATS_ED2K_USERS)?.getLong() ?: 0,
+                kadUsers = packet.numeric(EC_TAG_STATS_KAD_USERS)?.getLong() ?: 0,
+                ed2kFiles = packet.numeric(EC_TAG_STATS_ED2K_FILES)?.getLong() ?: 0,
+                kadFiles = packet.numeric(EC_TAG_STATS_KAD_FILES)?.getLong() ?: 0,
+                kadNodes = packet.numeric(EC_TAG_STATS_KAD_NODES)?.getLong() ?: 0,
                 // Following metrics are only available if the client is connected to the Kad network.
                 kadFirewalledUdp = (packet.byte(EC_TAG_STATS_KAD_FIREWALLED_UDP)?.getValue()?.let { !it.equals(0u) }),
-                kadIndexedSources = packet.numeric(EC_TAG_STATS_KAD_INDEXED_SOURCES)?.getInt(),
-                kadIndexedKeywords = packet.numeric(EC_TAG_STATS_KAD_INDEXED_KEYWORDS)?.getInt(),
-                kadIndexedNotes = packet.numeric(EC_TAG_STATS_KAD_INDEXED_NOTES)?.getInt(),
-                kadIndexedLoad = packet.numeric(EC_TAG_STATS_KAD_INDEXED_LOAD)?.getInt(),
+                kadIndexedSources = packet.numeric(EC_TAG_STATS_KAD_INDEXED_SOURCES)?.getLong(),
+                kadIndexedKeywords = packet.numeric(EC_TAG_STATS_KAD_INDEXED_KEYWORDS)?.getLong(),
+                kadIndexedNotes = packet.numeric(EC_TAG_STATS_KAD_INDEXED_NOTES)?.getLong(),
+                kadIndexedLoad = packet.numeric(EC_TAG_STATS_KAD_INDEXED_LOAD)?.getLong(),
                 kadIpAddress = packet.int(EC_TAG_STATS_KAD_IP_ADRESS)?.getValue()
                     ?.let { ByteBuffer.allocate(4).putInt(it.toInt()).array() }
                     ?.let { InetAddress.getByAddress(it).hostAddress },
