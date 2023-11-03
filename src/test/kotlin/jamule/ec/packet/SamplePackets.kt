@@ -90,8 +90,7 @@ internal class SamplePackets {
                 listOf(
                     StringTag(EC_TAG_STRING, "eD2k search can't be done if eD2k is not connected"),
                 )
-            )
-
+            ),
         )
 
         val statusResponse = ("000000220000008c0c10d08003021664d082020100d484020100d4860302" +

@@ -34,7 +34,7 @@ class AmuleClient(
         logger.info("Getting stats...")
         return when (val response = amuleConnection.sendRequest(StatsRequest())) {
             is StatsResponse -> Result.success(response).also { logger.info("Stats: $response") }
-            else -> Result.failure(CommunicationException("Unable to get stats"))
+            else -> Result.failure(CommunicationException("Unable to get stats, got response: $response"))
         }
     }
 
@@ -50,7 +50,7 @@ class AmuleClient(
         return when (val response = amuleConnection.sendRequest(SearchRequest(query, searchType, filters))) {
             is StringsResponse -> Result.success(response.string).also { logger.info("Search started") }
             is ErrorResponse -> Result.failure(response)
-            else -> Result.failure(CommunicationException("Unable to start search"))
+            else -> Result.failure(CommunicationException("Unable to start search, got response: $response"))
         }
     }
 
@@ -63,7 +63,7 @@ class AmuleClient(
             is SearchStatusResponse -> Result.success(response.status)
                 .also { logger.info("Search status: ${response.status}") }
 
-            else -> Result.failure(CommunicationException("Unable to get search status"))
+            else -> Result.failure(CommunicationException("Unable to get search status, got response: $response"))
         }
     }
 
@@ -76,7 +76,7 @@ class AmuleClient(
             is SearchResultsResponse -> Result.success(response)
                 .also { logger.info("Found ${response.files} results") }
 
-            else -> Result.failure(CommunicationException("Unable to get search results"))
+            else -> Result.failure(CommunicationException("Unable to get search results, got response: $response"))
         }
     }
 
@@ -112,9 +112,9 @@ class AmuleClient(
      */
     fun searchStop(): Result<Unit> {
         logger.info("Stopping search...")
-        return when (amuleConnection.sendRequest(SearchStopRequest())) {
+        return when (val response = amuleConnection.sendRequest(SearchStopRequest())) {
             is MiscDataResponse -> Result.success(Unit).also { logger.info("Search stopped") }
-            else -> Result.failure(CommunicationException("Unable to stop search"))
+            else -> Result.failure(CommunicationException("Unable to stop search, got response: $response"))
         }
     }
 
@@ -123,9 +123,9 @@ class AmuleClient(
      */
     fun downloadSearchResult(hash: ByteArray): Result<Unit> {
         logger.info("Downloading search result...")
-        return when (amuleConnection.sendRequest(DownloadSearchResultRequest(hash))) {
+        return when (val response = amuleConnection.sendRequest(DownloadSearchResultRequest(hash))) {
             is StringsResponse -> Result.success(Unit).also { logger.info("Search result downloaded") }
-            else -> Result.failure(CommunicationException("Unable to download search result"))
+            else -> Result.failure(CommunicationException("Unable to download search result, got response: $response"))
         }
     }
 
@@ -138,7 +138,7 @@ class AmuleClient(
         return when (val response = amuleConnection.sendRequest(AddLinkRequest(link))) {
             is NoopResponse -> Result.success(Unit).also { logger.info("Ed2k link downloaded") }
             is ErrorResponse -> Result.failure(response)
-            else -> Result.failure(CommunicationException("Unable to download ed2k link"))
+            else -> Result.failure(CommunicationException("Unable to download ed2k link, got response: $response"))
         }
     }
 
@@ -149,7 +149,7 @@ class AmuleClient(
         logger.info("Getting download queue...")
         return when (val response = amuleConnection.sendRequest(DownloadQueueRequest())) {
             is DownloadQueueResponse -> Result.success(response.partFiles)
-            else -> Result.failure(CommunicationException("Unable to get download queue"))
+            else -> Result.failure(CommunicationException("Unable to get download queue, got response: $response"))
         }
     }
 
@@ -160,7 +160,7 @@ class AmuleClient(
         logger.info("Getting shared files list...")
         return when (val response = amuleConnection.sendRequest(SharedFilesRequest())) {
             is SharedFilesResponse -> Result.success(response.sharedFiles)
-            else -> Result.failure(CommunicationException("Unable to get shared files list"))
+            else -> Result.failure(CommunicationException("Unable to get shared files list, got response: $response"))
         }
     }
 
@@ -172,7 +172,7 @@ class AmuleClient(
         return when (val response = amuleConnection.sendRequest(CreateCategoryRequest(category))) {
             is NoopResponse -> Result.success(Unit)
             is ErrorResponse -> Result.failure(response)
-            else -> Result.failure(CommunicationException("Unable to create category"))
+            else -> Result.failure(CommunicationException("Unable to create category, got response: $response"))
         }
     }
 
@@ -184,7 +184,7 @@ class AmuleClient(
         return when (val response = amuleConnection.sendRequest(GetPreferencesRequest(EcPrefs.EC_PREFS_CATEGORIES))) {
             is PrefsCategoriesResponse -> Result.success(response.categories)
             is EmptyPreferencesResponse -> Result.success(emptyList())
-            else -> Result.failure(CommunicationException("Unable to get categories"))
+            else -> Result.failure(CommunicationException("Unable to get categories, got response: $response"))
         }
     }
 
@@ -205,7 +205,7 @@ class AmuleClient(
             when (val response = amuleConnection.sendRequest(SetFileCategoryRequest(hash, categoryId))) {
                 is NoopResponse -> Unit
                 is ErrorResponse -> throw response
-                else -> throw CommunicationException("Unable to set file category")
+                else -> throw CommunicationException("Unable to set file category, got response: $response")
             }
         }
     }
@@ -218,7 +218,7 @@ class AmuleClient(
         return when (val response = amuleConnection.sendRequest(DownloadCommandRequest(hash, command))) {
             is NoopResponse -> Result.success(Unit)
             is ErrorResponse -> Result.failure(response)
-            else -> Result.failure(CommunicationException("Unable to send download command"))
+            else -> Result.failure(CommunicationException("Unable to send download command, got response: $response"))
         }
     }
 
