@@ -18,7 +18,7 @@ dependencies {
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.1")
     testImplementation("ch.qos.logback:logback-classic:1.4.11")
     testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.7.2")
