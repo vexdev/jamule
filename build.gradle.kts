@@ -22,7 +22,7 @@ dependencies {
     testImplementation("ch.qos.logback:logback-classic:1.4.11")
     testImplementation("io.mockk:mockk:1.13.8")
     testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.7.2")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.8.0")
     testImplementation("io.kotest.extensions:kotest-extensions-testcontainers:2.0.2")
 }
 
