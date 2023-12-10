@@ -20,6 +20,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.3")
     testImplementation("ch.qos.logback:logback-classic:1.4.11")
+    testImplementation("io.mockk:mockk:1.13.8")
     testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.7.2")
     testImplementation("io.kotest.extensions:kotest-extensions-testcontainers:2.0.2")

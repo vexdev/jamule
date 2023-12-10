@@ -16,14 +16,20 @@ import java.io.IOException
 import java.net.Socket
 
 internal class AmuleConnection(
-    private val host: String,
-    private val port: Int,
-    private val timeout: Int,
+    private var socketBuilder: () -> Socket,
     private val password: String,
     private val logger: Logger
 ) {
-    private var socket = Socket(host, port).apply { soTimeout = timeout }
     private var connected = false
+    private var socket = socketBuilder()
+
+    internal constructor(
+        host: String,
+        port: Int,
+        timeout: Int,
+        password: String,
+        logger: Logger
+    ) : this({ Socket(host, port).apply { soTimeout = timeout } }, password, logger)
 
     @OptIn(ExperimentalUnsignedTypes::class)
     private val tagParser = TagParser(logger)
@@ -42,7 +48,7 @@ internal class AmuleConnection(
             logger.info("Reconnecting...")
             connected = false
             runCatching { socket.close() }
-            socket = Socket(host, port).apply { soTimeout = timeout }
+            socket = socketBuilder()
             authenticate()
         }
     }
@@ -59,14 +65,16 @@ internal class AmuleConnection(
 
     @OptIn(ExperimentalUnsignedTypes::class)
     fun sendRequestNoAuth(request: Request): Response {
-        val outputStream = socket.getOutputStream()
-        val inputStream = socket.getInputStream().buffered()
-        val packet = request.packet()
-        packetWriter.write(packet, outputStream)
-        val responsePacket = packetParser.parse(inputStream)
-        return ResponseParser.parse(responsePacket).also {
-            if (it is ErrorResponse) {
-                throw ServerException(it.serverMessage)
+        synchronized(socket) {
+            val outputStream = socket.getOutputStream()
+            val inputStream = socket.getInputStream().buffered()
+            val packet = request.packet()
+            packetWriter.write(packet, outputStream)
+            val responsePacket = packetParser.parse(inputStream)
+            return ResponseParser.parse(responsePacket).also {
+                if (it is ErrorResponse) {
+                    throw ServerException(it.serverMessage)
+                }
             }
         }
     }
