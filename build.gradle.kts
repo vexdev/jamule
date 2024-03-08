@@ -2,7 +2,7 @@ plugins {
     signing
     `maven-publish`
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
-    id("org.jetbrains.kotlin.jvm") version "1.9.21"
+    id("org.jetbrains.kotlin.jvm") version "1.9.23"
     `java-library`
 }
 
