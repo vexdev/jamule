@@ -42,6 +42,18 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
+tasks.register<Test>("ciTest") {
+    description = "Runs the deterministic test suite used in CI."
+    group = "verification"
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    filter {
+        excludeTestsMatching("jamule.AmuleClientTest")
+        excludeTestsMatching("jamule.AmuleFailedConnectionTest")
+    }
+}
+
 group = "com.vexdev"
 
 signing {
