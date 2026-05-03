@@ -101,5 +101,7 @@ internal class SamplePackets {
                 "1d4e48541404041d4e485419")
             .hexToByteArray()
 
+        val malformedCompressedPacket = "000000230000000100".hexToByteArray()
+
     }
 }
