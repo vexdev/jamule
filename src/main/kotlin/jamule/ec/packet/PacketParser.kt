@@ -7,6 +7,7 @@ import jamule.exception.InvalidECException
 import org.slf4j.Logger
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.util.zip.DataFormatException
 import java.util.zip.Inflater
 
 @ExperimentalUnsignedTypes
@@ -87,16 +88,40 @@ internal class PacketParser(
     private fun decompressPayload(stream: InputStream, length: UInt): UByteArray {
         val compressed = stream.readNBytes(length.toInt())
         val inflater = Inflater()
-        inflater.setInput(compressed)
-        val outputStream = ByteArrayOutputStream(length.toInt())
-        val buffer = ByteArray(8192)
-        while (!inflater.finished()) {
-            val count = inflater.inflate(buffer)
-            outputStream.write(buffer, 0, count)
+        try {
+            inflater.setInput(compressed)
+            val outputStream = ByteArrayOutputStream(length.toInt().coerceAtMost(MAX_DECOMPRESSED_SIZE))
+            val buffer = ByteArray(8192)
+            while (!inflater.finished()) {
+                val count = inflater.inflate(buffer)
+                if (count > 0) {
+                    val decompressedSize = outputStream.size() + count
+                    if (decompressedSize > MAX_DECOMPRESSED_SIZE) {
+                        throw InvalidECException(
+                            "Packet decompressed size $decompressedSize exceeds limit $MAX_DECOMPRESSED_SIZE"
+                        )
+                    }
+                    outputStream.write(buffer, 0, count)
+                    continue
+                }
+                when {
+                    inflater.needsDictionary() ->
+                        throw InvalidECException("Compressed payload requires a dictionary")
+
+                    inflater.needsInput() ->
+                        throw InvalidECException("Compressed payload ended before decompression completed")
+
+                    else ->
+                        throw InvalidECException("Inflater made no progress while decompressing payload")
+                }
+            }
+            outputStream.close()
+            return outputStream.toByteArray().toUByteArray()
+        } catch (e: DataFormatException) {
+            throw InvalidECException("Compressed payload is malformed", e)
+        } finally {
+            inflater.end()
         }
-        outputStream.close()
-        inflater.end()
-        return outputStream.toByteArray().toUByteArray()
     }
 
     private fun InputStream.readUInt(): UInt =
@@ -112,6 +137,7 @@ internal class PacketParser(
     companion object {
         const val INDEX_TAG_COUNT = 1 // Index of the tag count in the payload
         const val TAG_COUNT_SIZE = LEN_USHORT // Size of the tag count in bytes
+        const val MAX_DECOMPRESSED_SIZE = 50 * 1024 * 1024
     }
 
 }
