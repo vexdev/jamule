@@ -15,4 +15,4 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run the Gradle test task
-        run: ./gradlew ciTest
+        run: ./gradlew --no-daemon test

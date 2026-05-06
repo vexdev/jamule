@@ -13,14 +13,18 @@ import org.slf4j.helpers.NOPLogger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-class AmuleClient(
-    host: String,
-    port: Int,
-    password: String,
-    timeout: Int = 0,
-    private val logger: Logger = NOPLogger.NOP_LOGGER
+class AmuleClient internal constructor(
+    private val amuleConnection: AmuleConnection,
+    private val logger: Logger = NOPLogger.NOP_LOGGER,
+    private val sleep: (Long) -> Unit = Thread::sleep,
 ) {
-    private val amuleConnection = AmuleConnection(host, port, timeout, password, logger)
+    constructor(
+        host: String,
+        port: Int,
+        password: String,
+        timeout: Int = 0,
+        logger: Logger = NOPLogger.NOP_LOGGER,
+    ) : this(AmuleConnection(host, port, timeout, password, logger), logger)
 
     /**
      * Sets up a new connection to the server.
@@ -93,7 +97,7 @@ class AmuleClient(
         // For some reason, the server returns always 100 if we don't wait a bit
         for (i in 0..<15) {
             searchStatus().getOrElse { return Result.failure(it) }
-            Thread.sleep(200)
+            sleep(200)
         }
         val start = System.currentTimeMillis()
         while (searchStatus().getOrElse { return Result.failure(it) } < 1f) {
@@ -102,7 +106,7 @@ class AmuleClient(
                 break
                 // Let's not return an error here, as the search might have finished
             }
-            Thread.sleep(100)
+            sleep(100)
         }
         return searchResults()
     }
