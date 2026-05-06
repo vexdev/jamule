@@ -1,10 +1,68 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":separateMajorReleases",
+    ":prHourlyLimitNone",
+    ":prConcurrentLimit10"
+  ],
   "baseBranches": [
     "main"
   ],
-  "rebaseWhen": "conflicted",
+  "timezone": "Europe/Zurich",
+  "schedule": [
+    "after 4am and before 8am every weekday"
+  ],
   "labels": [
     "dependencies"
   ],
-  "automergeStrategy": "merge-commit"
+  "rebaseWhen": "conflicted",
+  "prCreation": "not-pending",
+  "assignees": [
+    "vexdev"
+  ],
+  "packageRules": [
+    {
+      "description": "Group GitHub Actions updates together.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "github actions"
+    },
+    {
+      "description": "Group Gradle dependency and plugin updates together.",
+      "matchManagers": [
+        "gradle"
+      ],
+      "groupName": "gradle"
+    },
+    {
+      "description": "Group release tooling updates together.",
+      "matchManagers": [
+        "npm"
+      ],
+      "groupName": "release tooling",
+      "matchDepNames": [
+        "semantic-release",
+        "@semantic-release/changelog",
+        "@semantic-release/commit-analyzer",
+        "@semantic-release/exec",
+        "@semantic-release/git",
+        "@semantic-release/github",
+        "@semantic-release/release-notes-generator"
+      ]
+    },
+    {
+      "description": "Avoid surprise major upgrades for release tooling.",
+      "matchManagers": [
+        "npm"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "dependencyDashboardApproval": true
+    }
+  ]
 }
